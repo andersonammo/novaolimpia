@@ -22,7 +22,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* FUNDO E EFEITO 3D */
-        #full-bg-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; background: #111; transform: scale(1.20); transition: transform 0.1s ease-out; }
+        #full-bg-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; background: #111; transform: scale(1.15); transition: transform 0.1s ease-out; }
         
         #img-blurred-bg, #video-blurred-bg { width: 100%; height: 100%; object-fit: cover; filter: blur(5px) brightness(1.0); }
         #video-blurred-bg { display: none; }
@@ -36,7 +36,7 @@
             overflow: hidden; 
         }
         
-        .svg-engine { width: 100%; height: 100%; transform: scale(1.20); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
+        .svg-engine { width: 100%; height: 100%; transform: scale(1.15); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
         
         .lens-outline { fill: none; stroke: url(#lens-grad); stroke-width: 6; }
         
@@ -114,7 +114,11 @@
 
         .cart-area { display: flex; align-items: center; gap: 12px; padding-right: 25px; }
         .cart-product-name { font-size: 11px; color: var(--accent-blue); font-weight: 700; text-transform: uppercase; }
-        .cart-price { font-weight: 800; color: var(--accent-blue); font-size: 15px; width: 110px; text-align: right; }
+        .cart-price { font-weight: 800; color: var(--accent-blue); font-size: 15px; text-align: right; }
+        
+        .installment-select {
+            background: #f0f4f8; border: 1px solid #ccc; color: var(--accent-blue); font-weight: 800; font-size: 14px; cursor: pointer; outline: none; border-radius: 4px; padding: 2px 6px;
+        }
 
         .btn-lancar-os { background: var(--accent-blue); color: #fff; border: none; padding: 10px; font-size: 11px; font-weight: 800; border-radius: 6px; margin: 8px 12px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-lancar-os:hover { background: #002277; }
@@ -206,25 +210,40 @@
                 <span>OS</span>
             </div>
             <div class="tool-btn" id="btn-valor" onclick="toggleValorPopup()">
-                <i class="fas fa-dollar-sign"></i>
-                <span>Valor</span>
+                <i class="fas fa-cog"></i>
+                <span>Opções</span>
             </div>
             <div class="tool-btn" id="btn-calc" onclick="toggleCalcPopup()">
                 <i class="fas fa-calculator"></i>
                 <span>Calculadora</span>
             </div>
         </div>
+        
         <div class="cart-area">
             <span class="cart-product-name" id="cart-name">Selecione uma lente</span>
-            <span class="cart-price" id="cart-price">0,00</span>
+            
+            <div style="display:flex; align-items:center; gap: 6px;">
+                <select id="installment-select" class="installment-select" onchange="updateFinanceSystem()">
+                    <option value="1">1x</option>
+                    <option value="2">2x</option>
+                    <option value="3">3x</option>
+                    <option value="4">4x</option>
+                    <option value="5">5x</option>
+                    <option value="6">6x</option>
+                    <option value="7">7x</option>
+                    <option value="8">8x</option>
+                    <option value="9">9x</option>
+                    <option value="10">10x</option>
+                    <option value="11">11x</option>
+                    <option value="12" selected>12x</option>
+                </select>
+                <span class="cart-price" id="cart-price">R$ 0,00</span>
+            </div>
             <i class="fas fa-shopping-cart fa-lg" style="color: var(--accent-blue);"></i>
         </div>
         
         <div class="valor-popup" id="valor-popup">
-            <label class="vp-label"><input type="checkbox" id="chk-mostrar" checked onchange="updateFinanceSystem()"> Mostrar Valores</label>
-            <label class="vp-label"><input type="radio" name="paymethod" value="vista" onchange="updateFinanceSystem()"> à vista</label>
-            <label class="vp-label"><input type="radio" name="paymethod" value="debito" onchange="updateFinanceSystem()"> débito</label>
-            <label class="vp-label"><input type="radio" name="paymethod" value="prazo" checked onchange="updateFinanceSystem()"> à prazo</label>
+            <label class="vp-label"><input type="checkbox" id="chk-mostrar" checked onchange="updateFinanceSystem()"> Mostrar Valores de Preços</label>
         </div>
 
         <div class="calc-popup" id="calc-popup">
@@ -308,7 +327,6 @@
                     </div>
                     <div class="lens-options" onclick="event.stopPropagation()">
                         <div class="option-row"><span class="opt-label">Superfície:</span><select class="opt-select js-opt-surface" onchange="calculateCart()"><option value="0" data-name="Digital">Digital</option><option value="2400" data-name="Freeform">Freeform</option></select></div>
-                        <div class="option-row"><span class="opt-label">Fotossensível:</span><select class="opt-select js-opt-photosensitive" onchange="calculateCart()"><option value="0" data-name="Incolor">Não</option><option value="3600" data-name="Sim">Sim</option></select></div>
                         <div class="option-row"><span class="opt-label">Material:</span><select class="opt-select js-opt-material" onchange="calculateCart()"></select></div>
                         <div class="option-row"><span class="opt-label">Tratamento:</span><select class="opt-select js-opt-treatment" onchange="updateMaterials(this)"></select></div>
                         <button class="btn-lancar-os" onclick="lancarItemNaOS()">Lançar na OS <i class="fas fa-arrow-right"></i></button>
@@ -362,7 +380,8 @@
             const treatSelect = activeLensItem.querySelector('.js-opt-treatment');
             const treatName = treatSelect.value !== "Nenhum" ? treatSelect.value : "";
             
-            const total = parseFloat(matSelect.value) + parseFloat(activeLensItem.querySelector('.js-opt-surface').value) + parseFloat(activeLensItem.querySelector('.js-opt-photosensitive').value);
+            /* Removemos o js-opt-photosensitive daqui conforme solicitado */
+            const total = parseFloat(matSelect.value) + parseFloat(activeLensItem.querySelector('.js-opt-surface').value);
             activeLensItem.setAttribute('data-baseprice', total);
             
             document.getElementById('cart-name').innerText = `${currentLensModel} Digital ${matName} ${treatName}`;
@@ -372,12 +391,15 @@
         function toggleValorPopup() { document.getElementById('valor-popup').classList.toggle('show'); document.getElementById('calc-popup').classList.remove('show'); }
         function toggleCalcPopup() { document.getElementById('calc-popup').classList.toggle('show'); document.getElementById('valor-popup').classList.remove('show'); }
 
-        function formatPriceStr(totalBruto) {
+        function formatPriceStr(totalBruto, isCart = false) {
             if (!document.getElementById('chk-mostrar').checked) return "---"; 
-            const payMethod = document.querySelector('input[name="paymethod"]:checked').value;
-            if (payMethod === 'vista') return `${(totalBruto * 0.9).toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-            if (payMethod === 'debito') return `${totalBruto.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-            return `12x ${(totalBruto / 12).toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+            const parcelas = parseInt(document.getElementById('installment-select').value) || 12;
+            const valorParcela = totalBruto / parcelas;
+            
+            const formatted = valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            
+            if (isCart) return formatted;
+            return (parcelas === 1 ? "" : parcelas + "x ") + formatted;
         }
 
         function updateFinanceSystem() {
@@ -385,7 +407,7 @@
                 item.querySelector('.lens-price').innerText = formatPriceStr(parseFloat(item.getAttribute('data-baseprice')));
             });
             const finalPrice = activeLensItem ? parseFloat(activeLensItem.getAttribute('data-baseprice')) : 0;
-            document.getElementById('cart-price').innerText = formatPriceStr(finalPrice);
+            document.getElementById('cart-price').innerText = formatPriceStr(finalPrice, true);
         }
 
         function updateVisualSimulator(lvl) {
@@ -511,7 +533,7 @@
             const stage = document.querySelector('.simulator-stage');
             stage.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
             const bg = document.getElementById('full-bg-container');
-            bg.style.transform = `scale(1.20) translate(${-xAxis * 2}px, ${-yAxis * 2}px)`;
+            bg.style.transform = `scale(1.15) translate(${-xAxis * 2}px, ${-yAxis * 2}px)`;
         }
         
         window.onload = function() {

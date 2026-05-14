@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CADASTRO CLIENTES - PDV</title>
+    <!-- Fontes e Frameworks Modernos -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --ammo-navy: #0A2342; 
+            --ammo-gold: #FFC107; 
+            --ammo-light: #f4f7f9;
+            --ammo-gray: #e9ecef;
+            --transition-speed: 0.3s;
+        }
+        
+        /* Layout Tela Cheia */
+        html, body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: var(--ammo-light); 
+            font-family: 'Inter', sans-serif; 
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        #sistemaPDV {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Card Principal Tela Cheia */
+        .card { 
+            border: none; 
+            border-radius: 0; /* Removido arredondamento para encostar nas bordas */
+            box-shadow: none; 
+            margin-bottom: 0; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header { 
+            background: var(--ammo-navy); 
+            color: white; 
+            border-radius: 0 !important; 
+            font-weight: 600; 
+            letter-spacing: 0.5px;
+            padding: 15px 20px !important;
+            border-bottom: 4px solid var(--ammo-gold);
+            flex-shrink: 0;
+        }
+        
+        .card-body {
+            flex-grow: 1;
+            overflow-y: auto; /* Permite rolar apenas o conteúdo interno */
+            padding: 30px !important;
+        }
+
+        /* Stepper de Progresso */
+        .stepper-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 0 10%; /* Ajuste para não ficar colado nas bordas laterais na tela cheia */
+            position: relative;
+        }
+        .stepper-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 15%;
+            right: 15%;
+            height: 3px;
+            background: var(--ammo-gray);
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #a0aab5;
+            transition: var(--transition-speed);
+        }
+        .step.active { color: var(--ammo-navy); }
+        .step.completed { color: #198754; }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid var(--ammo-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 8px;
+            transition: var(--transition-speed);
+        }
+        .step.active .step-circle {
+            border-color: var(--ammo-gold);
+            background: var(--ammo-navy);
+            color: var(--ammo-gold);
+        }
+        .step.completed .step-circle {
+            border-color: #198754;
+            background: #198754;
+            color: white;
+        }
+
+        /* Campos de Formulário */
+        label { 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            color: #55606e; 
+            margin-bottom: 6px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            transition: all var(--transition-speed);
+            background-color: #fafbfc;
+        }
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--ammo-gold); 
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.15); 
+            background-color: #fff;
+        }
+        .bg-light { background-color: #f8f9fa !important; }
+        
+        /* Botões Modernos */
+        .btn-ammo { 
+            background: var(--ammo-gold); 
+            border: none; 
+            color: var(--ammo-navy); 
+            font-weight: 700; 
+            padding: 14px 24px; 
+            border-radius: 10px;
+            transition: all var(--transition-speed); 
+            letter-spacing: 0.5px;
+        }
+        .btn-ammo:hover { 
+            background: #f1b600; 
+            color: var(--ammo-navy); 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+        .btn-outline-custom {
+            border: 2px solid var(--ammo-navy);
+            color: var(--ammo-navy);
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 12px 24px;
+            transition: all var(--transition-speed);
+        }
+        .btn-outline-custom:hover {
+            background: var(--ammo-navy);
+            color: white;
+        }
+
+        /* Box de Informações */
+        .bg-receita-box { 
+            background-color: #ffffff; 
+            border: 1px solid rgba(10, 35, 66, 0.08); 
+            border-radius: 16px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            padding: 20px;
+        }
+        .header-receita { 
+            background-color: #f1f4f8; 
+            color: var(--ammo-navy); 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            text-transform: uppercase;
+        }
+        
+        /* Animações e Outros */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .radio-box { background: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 12px; display: flex; justify-content: space-around; }
+        .loading-cpf { background-image: url('https://i.gifer.com/ZZ5H.gif'); background-size: 20px; background-repeat: no-repeat; background-position: 98% center; }
+        
+        .produto-item { cursor: pointer; padding: 15px; border-bottom: 1px solid #f1f4f8; transition: var(--transition-speed); background: #fff; border-radius: 8px; margin-bottom: 5px;}
+        .produto-item:hover { background-color: rgba(255, 193, 7, 0.08); border-left: 4px solid var(--ammo-gold); padding-left: 19px; }
+        
+        /* Ajuste de Altura Dinâmica para Tela Cheia */
+        .lista-produtos { height: calc(100vh - 280px); overflow-y: auto; padding: 5px; }
+        .carrinho-lista { height: calc(100vh - 650px); min-height: 200px; overflow-y: auto; padding-right: 5px;}
+        
+        .total-box { 
+            background: linear-gradient(135deg, var(--ammo-navy), #1a3a60);
+            color: white; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 8px 20px rgba(10, 35, 66, 0.2);
+            border: 1px solid rgba(255,193,7, 0.3);
+        }
+        .total-box .text-gold { color: var(--ammo-gold); }
+
+        /* ==========================================
+           LAYOUT DE IMPRESSÃO COMPACTO A4
+           ========================================== */
+        @media print {
+            @page { margin: 5mm; } 
+            body * { visibility: hidden; }
+            #areaImpressao, #areaImpressao * { visibility: visible; }
+            #areaImpressao {
+                position: absolute; left: 0; top: 0; width: 100%;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #000;
+            }
+            .via-impressao { border: 1px solid #000; border-radius: 5px; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; }
+            .print-title { text-align: center; font-weight: 900; font-size: 13px; margin-bottom: 4px; letter-spacing: 1px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+            .print-subtitle { text-align: center; font-size: 11px; font-weight: bold; margin-top: -2px; margin-bottom: 6px; color: #444; }
+            .print-section { margin-bottom: 6px; line-height: 1.2; }
+            .print-section b { color: #222; }
+            .print-row { display: flex; justify-content: space-between; margin-bottom: 3px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
+            .print-row:last-child { border-bottom: none; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 4px; margin-bottom: 4px; }
+            .print-table th, .print-table td { border: 1px solid #000; padding: 2px; text-align: center; font-size: 9px; }
+            .print-table th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
+            .termo-entrega { margin-top: 8px; border: 1px solid #000; padding: 6px; border-radius: 5px; background-color: #f9f9f9 !important; -webkit-print-color-adjust: exact; }
+            .termo-titulo { text-align: center; font-weight: 900; font-size: 10px; margin-bottom: 3px; }
+            .termo-desc { text-align: center; font-size: 9px; margin-bottom: 6px; font-style: italic; }
+            .check-item { display: flex; align-items: center; margin-bottom: 4px; font-weight: bold; font-size: 9px; }
+            .check-box { margin-right: 10px; font-weight: normal; }
+            .assinatura-box { margin-top: 20px; display: flex; justify-content: space-around; }
+            .assinatura-linha { border-top: 1px solid #000; width: 40%; text-align: center; padding-top: 3px; font-weight: bold; font-size: 9px; }
+            .destaque-valor { font-size: 12px; font-weight: 900; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0" id="sistemaPDV">
+    <div class="row g-0 h-100">
+        <div class="col-12 h-100"> 
+            
+            <div class="card" id="cardPrincipal">
+                <div class="card-header text-center" id="tituloCard">
+                    <h4 class="mb-0 fw-bold"><i class="fas fa-store me-2"></i>SISTEMA DE VENDAS PDV</h4>
+                </div>
+                
+                <div class="card-body bg-white">
+                    
+                    <!-- Stepper Progress -->
+                    <div class="stepper-wrapper">
+                        <div class="step active" id="st-cliente">
+                            <div class="step-circle">1</div>
+                            <span class="fw-bold small">Cliente</span>
+                        </div>
+                        <div class="step" id="st-receita">
+                            <div class="step-circle">2</div>
+                            <span class="fw-bold small">Receita</span>
+                        </div>
+                        <div class="step" id="st-venda">
+                            <div class="step-circle">3</div>
+                            <span class="fw-bold small">Venda</span>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 1: CLIENTE -->
+                    <div id="moduloCliente" class="fade-in container-fluid px-0 px-md-4">
+                        <h5 class="text-secondary mb-4 border-bottom pb-2"><i class="fas fa-user-plus me-2 text-primary"></i>Dados do Cliente</h5>
+                        <form id="formPDV">
+                            <div class="mb-4">
+                                <label><i class="fas fa-id-badge me-2"></i>Consultor(a) de Vendas</label>
+                                <select class="form-select border-primary bg-light" id="vendedor" required>
+                                    <option value="">Carregando...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>CPF (Busca Automática)</label>
+                                    <input type="text" class="form-control border-primary shadow-sm" id="cpf" placeholder="000.000.000-00">
+                                </div>
+                                <div class="col-md-8">
+                                    <label>Nome Completo do Cliente</label>
+                                    <input type="text" class="form-control" id="nome" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label>Data de Nascimento</label>
+                                    <input type="date" class="form-control" id="nascimento">
+                                </div>
+                                <div class="col-md-8">
+                                    <label>Sexo</label>
+                                    <div class="radio-box">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="sexo" id="m" value="M" checked>
+                                            <label class="form-check-label text-capitalize" for="m">Masculino</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="sexo" id="f" value="F">
+                                            <label class="form-check-label text-capitalize" for="f">Feminino</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="sexo" id="o" value="O">
+                                            <label class="form-check-label text-capitalize" for="o">Outros</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ENDEREÇO COMPLETO -->
+                            <div class="p-4 mb-4 bg-light" style="border-radius: 12px;">
+                                <h6 class="text-primary mb-3 fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Endereço</h6>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label>CEP</label>
+                                        <input type="text" class="form-control bg-white" id="cep" placeholder="00000-000">
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label>Rua / Logradouro</label>
+                                        <input type="text" class="form-control bg-white" id="rua">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>Número</label>
+                                        <input type="text" class="form-control bg-white" id="numero" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <label>Bairro</label>
+                                        <input type="text" class="form-control bg-white" id="bairro">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Complemento</label>
+                                        <input type="text" class="form-control bg-white" id="complemento" placeholder="Apto, Bloco, etc.">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Cidade / UF</label>
+                                        <input type="text" class="form-control bg-white" id="cidade_uf" placeholder="Cidade - UF">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label>E-mail</label>
+                                    <input type="email" class="form-control" id="email" placeholder="cliente@email.com">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label>Telefone 01 (Celular)</label>
+                                    <input type="text" class="form-control border-primary shadow-sm" id="tel1" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Telefone 02 (Opcional)</label>
+                                    <input type="text" class="form-control" id="tel2">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label>Observações Gerais</label>
+                                <textarea class="form-control" id="obs" rows="2" placeholder="Ex: Cliente prefere ser contatado pelo WhatsApp..."></textarea>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="submit" class="btn btn-ammo px-5" id="btnSalvarCliente">
+                                    Avançar para Receita <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- MÓDULO 2: RECEITA -->
+                    <div id="moduloReceita" style="display: none;" class="fade-in container-fluid px-0 px-md-4">
+                        <div class="alert alert-primary py-3 mb-4 d-flex align-items-center rounded-3 border-0 bg-light">
+                            <i class="fas fa-user-circle fa-2x text-primary me-3"></i>
+                            <div>
+                                <h6 class="mb-0 text-secondary">Cliente Selecionado</h6>
+                                <strong class="fs-5 nomeClienteDisplay text-dark"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <label>Nome do Médico / Clínica</label>
+                                <input type="text" class="form-control" id="medico" placeholder="Dr. / Dra.">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Data da Receita</label>
+                                <input type="date" class="form-control" id="dataReceita">
+                            </div>
+                        </div>
+
+                        <div class="bg-receita-box mb-4">
+                            <div class="text-center header-receita mb-3"><i class="fas fa-eye me-2"></i> Visão para Longe</div>
+                            <div class="row align-items-center mb-3">
+                                <div class="col-2 text-center fw-bold text-primary fs-5">OD</div>
+                                <div class="col-3"><input type="text" inputmode="decimal" class="form-control text-center" id="lOdEsf" placeholder="Esférico" onchange="travarDioptria(this, false)"></div>
+                                <div class="col-3"><input type="text" inputmode="decimal" class="form-control text-center" id="lOdCil" placeholder="Cilíndrico" onchange="travarDioptria(this, true)"></div>
+                                <div class="col-4"><input type="number" class="form-control text-center" id="lOdEixo" placeholder="Eixo"></div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center fw-bold text-primary fs-5">OE</div>
+                                <div class="col-3"><input type="text" inputmode="decimal" class="form-control text-center" id="lOeEsf" placeholder="Esférico" onchange="travarDioptria(this, false)"></div>
+                                <div class="col-3"><input type="text" inputmode="decimal" class="form-control text-center" id="lOeCil" placeholder="Cilíndrico" onchange="travarDioptria(this, true)"></div>
+                                <div class="col-4"><input type="number" class="form-control text-center" id="lOeEixo" placeholder="Eixo"></div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-4 text-center">
+                                <label class="fw-bold text-warning" style="font-size: 1rem;"><i class="fas fa-plus-circle me-1"></i> ADIÇÃO (+)</label>
+                                <input type="text" inputmode="decimal" class="form-control form-control-lg text-center border-warning shadow-sm" style="font-size: 1.5rem;" id="adicao" placeholder="0.00" onchange="travarDioptria(this, false, true)">
+                            </div>
+                        </div>
+
+                        <div class="bg-receita-box mb-4" style="background-color: #f8f9fa;">
+                            <div class="text-center header-receita mb-3 bg-secondary text-white"><i class="fas fa-glasses me-2"></i> Visão para Perto (Calculado)</div>
+                            <div class="row align-items-center mb-3">
+                                <div class="col-2 text-center fw-bold text-secondary fs-5">OD</div>
+                                <div class="col-3"><input type="text" class="form-control text-center bg-white" id="pOdEsf" placeholder="Esférico" readonly></div>
+                                <div class="col-3"><input type="text" class="form-control text-center bg-white" id="pOdCil" placeholder="Cilíndrico" readonly></div>
+                                <div class="col-4"><input type="text" class="form-control text-center bg-white" id="pOdEixo" placeholder="Eixo" readonly></div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center fw-bold text-secondary fs-5">OE</div>
+                                <div class="col-3"><input type="text" class="form-control text-center bg-white" id="pOeEsf" placeholder="Esférico" readonly></div>
+                                <div class="col-3"><input type="text" class="form-control text-center bg-white" id="pOeCil" placeholder="Cilíndrico" readonly></div>
+                                <div class="col-4"><input type="text" class="form-control text-center bg-white" id="pOeEixo" placeholder="Eixo" readonly></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-receita-box mb-4" style="border: 2px solid #e0f2fe;">
+                            <div class="text-center header-receita mb-3" style="background-color: #0dcaf0; color: #000;"><i class="fas fa-ruler me-2"></i> Medidas DNP e Altura</div>
+                            <div class="row text-center mb-2">
+                                <div class="col-2"></div>
+                                <div class="col-5 fw-bold text-info">DNP (mm)</div>
+                                <div class="col-5 fw-bold text-info">ALTURA (mm)</div>
+                            </div>
+                            <div class="row align-items-center mb-3">
+                                <div class="col-2 text-center fw-bold text-primary fs-5">OD</div>
+                                <div class="col-5"><input type="number" step="0.1" class="form-control text-center" id="dnpOd" placeholder="Ex: 32"></div>
+                                <div class="col-5"><input type="number" step="0.1" class="form-control text-center" id="altOd" placeholder="Ex: 22"></div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center fw-bold text-primary fs-5">OE</div>
+                                <div class="col-5"><input type="number" step="0.1" class="form-control text-center" id="dnpOe" placeholder="Ex: 33"></div>
+                                <div class="col-5"><input type="number" step="0.1" class="form-control text-center" id="altOe" placeholder="Ex: 22"></div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-custom" onclick="navegarAbas('cliente')">
+                                <i class="fas fa-arrow-left me-2"></i> Voltar
+                            </button>
+                            <button type="button" class="btn btn-ammo px-5" id="btnSalvarReceita" onclick="enviarReceita()">
+                                Ir para Orçamento <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 3: VENDAS -->
+                    <div id="moduloVendas" style="display: none;" class="fade-in container-fluid px-0 px-md-4">
+                        <div class="alert alert-primary py-3 mb-4 d-flex align-items-center rounded-3 border-0 bg-light">
+                            <i class="fas fa-user-circle fa-2x text-primary me-3"></i>
+                            <div>
+                                <h6 class="mb-0 text-secondary">Cliente Selecionado</h6>
+                                <strong class="fs-5 nomeClienteDisplay text-dark"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 h-100">
+                            <!-- Coluna Esquerda: Carrinho e Pagamento -->
+                            <div class="col-lg-7 d-flex flex-column">
+                                <div class="bg-receita-box flex-grow-1 p-4 d-flex flex-column">
+                                    <div class="text-center header-receita mb-3 bg-primary text-white">
+                                        <i class="fas fa-shopping-cart me-2"></i>CARRINHO DE COMPRAS
+                                    </div>
+                                    
+                                    <div class="carrinho-lista mb-4 flex-grow-1" id="areaCarrinho">
+                                        <div class="text-muted small text-center mt-5 mb-5">
+                                            <i class="fas fa-box-open fa-3x mb-3 opacity-25"></i><br>
+                                            Nenhum produto adicionado.<br>Pesquise e clique no catálogo ao lado.
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="mb-4">
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-12 mb-3">
+                                            <label>Subtotal (R$)</label>
+                                            <input type="text" class="form-control bg-light fw-bold fs-5" id="subtotal" value="0.00" readonly>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="text-danger fw-bold">Desconto (-)</label>
+                                            <input type="number" step="0.01" class="form-control border-danger text-danger" id="vDesconto" placeholder="0.00" oninput="calcularTotalVenda()">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="text-primary fw-bold">Acréscimo (+)</label>
+                                            <input type="number" step="0.01" class="form-control border-primary text-primary" id="vAcrescimo" placeholder="0.00" oninput="calcularTotalVenda()">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="total-box text-center mb-4" id="boxTotal">
+                                        <span class="d-block mb-1" style="font-size: 1rem; opacity: 0.9;">TOTAL DA COMPRA</span>
+                                        <span id="vTotalDisplay" class="text-gold fw-bold" style="font-size: 2.5rem; letter-spacing: 1px;">R$ 0,00</span>
+                                    </div>
+
+                                    <div class="text-center header-receita mb-3 bg-secondary text-white">
+                                        <i class="fas fa-money-check-alt me-2"></i>PAGAMENTO E RETIRADA
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="text-primary">Data de Retirada / Entrega</label>
+                                            <input type="date" class="form-control border-primary" id="dataEntrega" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="text-success">Valor Pago (Entrada R$)</label>
+                                            <input type="number" step="0.01" class="form-control border-success bg-light fw-bold" id="valorEntrada" placeholder="0.00" oninput="calcularTotalVenda()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label>Condição (Do Saldo Restante)</label>
+                                            <div class="d-flex gap-3 mt-1 bg-light p-2 rounded border">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="condicao" id="condAvista" value="A Vista" checked onchange="mudarParcelas()">
+                                                    <label class="form-check-label" for="condAvista">À Vista</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="condicao" id="condParcelado" value="Parcelado" onchange="mudarParcelas()">
+                                                    <label class="form-check-label" for="condParcelado">Parcelado</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Forma de Pgto</label>
+                                            <select class="form-select border-success bg-light" id="formaPgto">
+                                                <option>Dinheiro</option>
+                                                <option>Pix</option>
+                                                <option>Cartão de Débito</option>
+                                                <option>Cartão de Crédito</option>
+                                                <option>Boleto</option>
+                                                <option>Bonuscred</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-4 fade-in" id="divParcelas" style="display:none;">
+                                        <div class="col-12">
+                                            <label>Nº de Parcelas do Saldo <small class="text-primary ms-1">(+2% de juros/parcela)</small></label>
+                                            <select class="form-select border-warning shadow-sm" id="qtdParcelas" onchange="calcularTotalVenda()">
+                                                <option value="1">1x (Sem juros)</option>
+                                                <option value="2">2x</option>
+                                                <option value="3">3x</option>
+                                                <option value="4">4x</option>
+                                                <option value="5">5x</option>
+                                                <option value="6">6x</option>
+                                                <option value="7">7x</option>
+                                                <option value="8">8x</option>
+                                                <option value="9">9x</option>
+                                                <option value="10">10x</option>
+                                                <option value="11">11x</option>
+                                                <option value="12">12x</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-warning text-center fw-bold mt-3 border-warning shadow-sm fade-in" id="boxSaldo" style="display:none;">
+                                        <i class="fas fa-exclamation-circle mb-2 fa-lg text-warning"></i><br>
+                                        SALDO DEVEDOR A PAGAR NA RETIRADA:<br>
+                                        <span id="vSaldoDisplay" style="font-size:1.8rem; display:block; margin-top:5px; color:#d39e00;">R$ 0,00</span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Coluna Direita: Produtos -->
+                            <div class="col-lg-5 d-flex flex-column">
+                                <div class="bg-receita-box flex-grow-1 border-primary border d-flex flex-column">
+                                    <div class="text-center header-receita mb-3 bg-light text-dark border"><i class="fas fa-search me-2"></i>CATÁLOGO DE PRODUTOS</div>
+                                    <div class="input-group mb-3 shadow-sm rounded-3">
+                                        <span class="input-group-text bg-white border-primary text-primary"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control border-primary border-start-0 ps-0" id="buscaProduto" placeholder="Pesquisar armação ou lente..." onkeyup="filtrarProdutos()">
+                                    </div>
+                                    <div class="lista-produtos flex-grow-1" id="listaProdutosDisplay">
+                                        <div class="text-center p-5 text-muted">
+                                            <div class="spinner-border text-primary mb-3" role="status"></div><br>
+                                            Sincronizando estoque...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões Finais -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-4">
+                            <button type="button" class="btn btn-outline-custom" onclick="navegarAbas('receita')">
+                                <i class="fas fa-arrow-left me-2"></i> Voltar
+                            </button>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-warning fw-bold px-4 text-dark" type="button" onclick="processarOperacao('orcamento')">
+                                    <i class="fas fa-file-invoice me-2"></i> GERAR ORÇAMENTO
+                                </button>
+                                <button class="btn btn-success fw-bold px-4 shadow" type="button" id="btnFinalVenda" onclick="processarOperacao('venda')">
+                                    <i class="fas fa-check-circle me-2"></i> FINALIZAR VENDA
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="areaImpressao" style="display: none;"></div>
+
+<script src="https://unpkg.com/imask"></script>
+<script>
+    // ==========================================
+    // CONFIGURAÇÕES GERAIS E VARIÁVEIS (ATUALIZADO PARA BANCO DUPLO)
+    // ==========================================
+    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Servidor Central (Backup invisível)
+    const URL_BASE_2_PRINCIPAL = "https://script.google.com/macros/s/AKfycbzciM5IA25tZ9CcRkwj0-okP5CQ0IG3wpmZeT40vbPGiCtovD3au5Ccgr9jTxcJhSc6/exec"; // Servidor Local (Leitura e Escrita principal)
+
+    let estoqueGlobal = []; 
+    let carrinho = [];
+    let vendedorConfirmado = "";
+
+    IMask(document.getElementById('cpf'), { mask: '000.000.000-00' });
+    IMask(document.getElementById('cep'), { mask: '00000-000' });
+    IMask(document.getElementById('tel1'), { mask: '(00) 00000-0000' });
+    IMask(document.getElementById('tel2'), { mask: '(00) 00000-0000' });
+
+    let d = new Date(); 
+    d.setDate(d.getDate() + 7); 
+    document.getElementById('dataEntrega').valueAsDate = d;
+
+    window.onload = () => {
+        const select = document.getElementById('vendedor'); 
+        select.innerHTML = '<option value="">Carregando...</option>';
+        
+        // LEITURA INICIAL: Busca os dados apenas do Banco Principal (Base 2)
+        fetch(URL_BASE_2_PRINCIPAL).then(res => res.json()).then(data => {
+            if (data.erro) { alert("Erro de conexão: " + data.erro); return; }
+            select.innerHTML = '<option value="">Selecione seu nome...</option>';
+            if (data.vendedores && data.vendedores.length > 0) { 
+                data.vendedores.forEach(v => { if(v) select.innerHTML += `<option value="${v}">${v}</option>`; }); 
+            } else {
+                select.innerHTML += '<option value="Vendedor Teste">Vendedor Teste</option>';
+            }
+            if(data.produtos) { 
+                estoqueGlobal = data.produtos; renderizarListaProdutos(estoqueGlobal); 
+            } else { 
+                document.getElementById('listaProdutosDisplay').innerHTML = "<div class='p-4 text-center text-muted'>Sem produtos.</div>"; 
+            }
+
+            const lenteSalva = localStorage.getItem('lente_ammo_pendente');
+            if (lenteSalva) {
+                try {
+                    const lente = JSON.parse(lenteSalva);
+                    addAoCarrinho(lente.codigo, lente.nome, lente.valor);
+                    localStorage.removeItem('lente_ammo_pendente');
+                } catch (e) { console.error("Erro ao ler lente", e); }
+            }
+        }).catch(err => { 
+            alert("Erro de rede. A URL do Apps Script pode estar incorreta."); 
+        });
+    };
+
+    // ========================================================
+    // NAVEGAÇÃO ENTRE ABAS (COM BOTÃO DE VOLTAR)
+    // ========================================================
+    function atualizarStepper(stepNumber) {
+        document.querySelectorAll('.step').forEach((el, index) => {
+            el.classList.remove('active', 'completed');
+            if (index < stepNumber - 1) el.classList.add('completed');
+            if (index === stepNumber - 1) el.classList.add('active');
+        });
+    }
+
+    function navegarAbas(destino) {
+        document.getElementById('moduloCliente').style.display = 'none';
+        document.getElementById('moduloReceita').style.display = 'none';
+        document.getElementById('moduloVendas').style.display = 'none';
+
+        if(destino === 'cliente') {
+            document.getElementById('moduloCliente').style.display = 'block';
+            atualizarStepper(1);
+        } else if (destino === 'receita') {
+            document.getElementById('moduloReceita').style.display = 'block';
+            atualizarStepper(2);
+        } else if (destino === 'vendas') {
+            document.getElementById('moduloVendas').style.display = 'block';
+            atualizarStepper(3);
+        }
+    }
+
+    // ========================================================
+    // LÓGICA DE PRODUTOS E CARRINHO
+    // ========================================================
+    function renderizarListaProdutos(lista) {
+        const div = document.getElementById('listaProdutosDisplay'); 
+        div.innerHTML = "";
+        if(lista.length === 0) { 
+            div.innerHTML = "<div class='p-4 text-center text-muted'><i class='fas fa-search mb-2 fa-2x'></i><br>Nenhum produto encontrado.</div>"; 
+            return; 
+        }
+        lista.forEach((p) => {
+            div.innerHTML += `
+                <div class="produto-item d-flex justify-content-between align-items-center" onclick="addAoCarrinho('${p.codigo}', '${p.nome}', ${p.valor})">
+                    <div><span class="badge bg-primary mb-1">${p.codigo}</span><br><span style="font-weight: 600; color: #333; font-size: 0.9rem;">${p.nome}</span></div>
+                    <div class="text-success fw-bold">R$ ${p.valor.toFixed(2)}</div>
+                </div>`;
+        });
+    }
+
+    function filtrarProdutos() {
+        const termo = document.getElementById('buscaProduto').value.toLowerCase();
+        const filtrados = estoqueGlobal.filter(p => p.nome.toLowerCase().includes(termo) || String(p.codigo).includes(termo));
+        renderizarListaProdutos(filtrados);
+    }
+
+    function addAoCarrinho(codigo, nome, valor) {
+        const itemExistente = carrinho.find(i => i.codigo === codigo);
+        if(itemExistente) { itemExistente.qtd += 1; } 
+        else { carrinho.push({ codigo, nome, valor, qtd: 1 }); }
+        atualizarCarrinhoVisual();
+    }
+    
+    function removerDoCarrinho(index) { 
+        carrinho.splice(index, 1); 
+        atualizarCarrinhoVisual(); 
+    }
+    
+    function alterarQtd(index, novaQtd) { 
+        if(novaQtd < 1) return; 
+        carrinho[index].qtd = parseInt(novaQtd); 
+        atualizarCarrinhoVisual(); 
+    }
+
+    function atualizarCarrinhoVisual() {
+        const div = document.getElementById('areaCarrinho'); 
+        div.innerHTML = ""; 
+        let subtotal = 0;
+        if(carrinho.length === 0) {
+            div.innerHTML = '<div class="text-muted small text-center mt-5 mb-5"><i class="fas fa-box-open fa-3x mb-3 opacity-25"></i><br>Nenhum produto adicionado.</div>';
+        } else {
+            carrinho.forEach((item, index) => {
+                const totalItem = item.valor * item.qtd; 
+                subtotal += totalItem;
+                div.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center bg-white p-3 border rounded-3 mb-2 shadow-sm">
+                        <div style="flex: 2;"><span class="fw-bold text-dark d-block" style="font-size:0.95rem">${item.nome}</span><small class="text-muted">R$ ${item.valor.toFixed(2)} un</small></div>
+                        <div class="d-flex align-items-center mx-3"><input type="number" class="form-control text-center p-1" style="width:60px; font-weight:bold;" value="${item.qtd}" onchange="alterarQtd(${index}, this.value)"></div>
+                        <div class="fw-bold text-success" style="width: 90px; text-align:right;">R$ ${totalItem.toFixed(2)}</div>
+                        <button class="btn btn-sm btn-light text-danger ms-2" onclick="removerDoCarrinho(${index})"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
+            });
+        }
+        document.getElementById('subtotal').value = subtotal.toFixed(2);
+        calcularTotalVenda();
+    }
+
+    function calcularTotalVenda() {
+        const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
+        const desconto = parseFloat(document.getElementById('vDesconto').value) || 0;
+        const acrescimo = parseFloat(document.getElementById('vAcrescimo').value) || 0;
+        const entrada = parseFloat(document.getElementById('valorEntrada').value) || 0;
+        
+        let totalBase = subtotal - desconto + acrescimo;
+        if(totalBase < 0) totalBase = 0;
+        
+        let restanteBase = totalBase - entrada;
+        if(restanteBase < 0) restanteBase = 0;
+        
+        const condicaoElement = document.querySelector('input[name="condicao"]:checked');
+        const condicao = condicaoElement ? condicaoElement.value : 'A Vista';
+        
+        let saldoDevedorFinal = restanteBase;
+        let textoDescricaoParcelas = "";
+
+        if (condicao === 'Parcelado' && restanteBase > 0) {
+            const qtdParcelas = parseInt(document.getElementById('qtdParcelas').value) || 1;
+            if (qtdParcelas > 1) {
+                let valorParcelaBase = restanteBase / qtdParcelas;
+                let valorParcelaComJuros = valorParcelaBase * 1.02; 
+                saldoDevedorFinal = valorParcelaComJuros * qtdParcelas;
+                textoDescricaoParcelas = `<br><span style="font-size: 1rem; color: #0dcaf0; font-weight: bold; background: white; padding: 4px 10px; border-radius: 6px; margin-top: 8px; display: inline-block;">${qtdParcelas}x de ${valorParcelaComJuros.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>`;
+            }
+        }
+        
+        document.getElementById('vTotalDisplay').innerHTML = totalBase.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('vTotalDisplay').dataset.valor = totalBase.toFixed(2); 
+
+        if(entrada > 0 || condicao === 'Parcelado') {
+            document.getElementById('boxSaldo').style.display = 'block';
+            document.getElementById('vSaldoDisplay').innerHTML = saldoDevedorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) + textoDescricaoParcelas;
+            document.getElementById('vSaldoDisplay').dataset.valor = saldoDevedorFinal.toFixed(2);
+            document.getElementById('vSaldoDisplay').dataset.parcelatexto = (condicao === 'Parcelado' && restanteBase > 0 && parseInt(document.getElementById('qtdParcelas').value) > 1) ? `(${document.getElementById('qtdParcelas').value}x)` : '';
+        } else {
+            document.getElementById('boxSaldo').style.display = 'none';
+            document.getElementById('vSaldoDisplay').dataset.valor = "0.00";
+            document.getElementById('vSaldoDisplay').dataset.parcelatexto = "";
+        }
+    }
+
+    function mudarParcelas() {
+        const condicao = document.querySelector('input[name="condicao"]:checked').value;
+        const divParc = document.getElementById('divParcelas');
+        if(condicao === 'Parcelado') { 
+            divParc.style.display = 'flex'; 
+        } else { 
+            divParc.style.display = 'none'; 
+            document.getElementById('qtdParcelas').value = "1"; 
+        }
+        calcularTotalVenda();
+    }
+
+    // =========================================================================
+    // INTEGRAÇÃO VIACEP E DADOS
+    // =========================================================================
+    document.getElementById('cep').addEventListener('blur', function() {
+        let v = this.value.replace(/\D/g,'');
+        if(v.length === 8) { 
+            fetch(`https://viacep.com.br/ws/${v}/json/`)
+            .then(r => r.json())
+            .then(d => { 
+                if(!d.erro) {
+                    document.getElementById('rua').value = d.logradouro || "";
+                    document.getElementById('bairro').value = d.bairro || "";
+                    document.getElementById('cidade_uf').value = `${d.localidade} - ${d.uf}`;
+                    document.getElementById('numero').focus();
+                } 
+            }); 
+        }
+    });
+
+    document.getElementById('cpf').addEventListener('blur', async function() {
+        if(this.value.length === 14) {
+            this.classList.add('loading-cpf');
+            try {
+                // LEITURA DO CPF: Busca dados no Banco Principal (Base 2)
+                const response = await fetch(URL_BASE_2_PRINCIPAL + "?cpf=" + this.value); 
+                const data = await response.json();
+                if(data && data.encontrado) {
+                    document.getElementById('nome').value = data.nome || ""; 
+                    document.getElementById('nascimento').value = data.nascimento || ""; 
+                    document.getElementById('cep').value = data.cep || ""; 
+                    document.getElementById('rua').value = data.rua || "";
+                    document.getElementById('numero').value = data.numero || "";
+                    document.getElementById('bairro').value = data.bairro || "";
+                    document.getElementById('complemento').value = data.complemento || "";
+                    document.getElementById('cidade_uf').value = data.cidade || ""; 
+                    document.getElementById('email').value = data.email || ""; 
+                    document.getElementById('tel1').value = data.tel1 || ""; 
+                    document.getElementById('tel2').value = data.tel2 || ""; 
+                    document.getElementById('obs').value = data.obs || "";
+                    if(data.sexo) { 
+                        const radio = document.querySelector(`input[name="sexo"][value="${data.sexo}"]`); 
+                        if(radio) radio.checked = true; 
+                    }
+                    alert("✅ Dados do cliente preenchidos automaticamente!");
+                }
+            } catch (erro) {} finally { this.classList.remove('loading-cpf'); }
+        }
+    });
+
+    function travarDioptria(elemento, isCilindro, isAdicao = false) {
+        if (!elemento.value) { calcularPerto(); return; } 
+        let valor = parseFloat(String(elemento.value).replace(',', '.')); 
+        if (isNaN(valor)) { elemento.value = ""; calcularPerto(); return; }
+        valor = Math.round(valor * 4) / 4; 
+        if (isCilindro && valor > 0) valor = -valor; 
+        if (isAdicao && valor < 0) valor = Math.abs(valor); 
+        elemento.value = (valor > 0 && !isCilindro ? "+" : "") + valor.toFixed(2); 
+        calcularPerto();
+    }
+
+    function formatarDataBR(dataString) {
+        if(!dataString) return '___/___/_____';
+        let d = new Date(dataString + 'T00:00:00'); 
+        return d.toLocaleDateString('pt-BR');
+    }
+
+    // ========================================================
+    // PROCESSAMENTO E IMPRESSÃO (COM VOLTA AUTOMÁTICA)
+    // ========================================================
+    function montarHtmlImpressao(dadosVenda) {
+        const divImpressao = document.getElementById('areaImpressao');
+        document.getElementById('sistemaPDV').style.display = 'none'; 
+        divImpressao.style.display = 'block';
+
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        const osNumero = dadosVenda.idVenda; 
+        const dataRetiradaFormatada = formatarDataBR(document.getElementById('dataEntrega').value);
+        
+        let produtosHTML = "";
+        carrinho.forEach(item => { 
+            produtosHTML += `<div class="print-row"><span>${item.qtd}x ${item.nome}</span> <span>R$ ${(item.valor * item.qtd).toFixed(2)}</span></div>`; 
+        });
+
+        const totalBaseTexto = parseFloat(document.getElementById('vTotalDisplay').dataset.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const entradaValor = parseFloat(document.getElementById('valorEntrada').value || 0);
+        const entradaTexto = entradaValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const saldoValor = parseFloat(document.getElementById('vSaldoDisplay').dataset.valor || 0);
+        const saldoTexto = saldoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const textParcelaExtra = document.getElementById('vSaldoDisplay').dataset.parcelatexto || '';
+
+        if (dadosVenda.tipo === 'orcamento') {
+            divImpressao.innerHTML = `
+                <div class="via-impressao">
+                    <div class="print-title">ÓTICAS AMMO</div>
+                    <div class="print-subtitle" style="font-size: 14px;">ORÇAMENTO DE PRODUTOS</div>
+                    <div class="print-section" style="background:#f0f0f0; padding:8px; border-radius:3px;">
+                        <b>ID:</b> ${osNumero} | <b>Data:</b> ${dataAtual}<br>
+                        <b>Colaborador(a):</b> ${dadosVenda.vendedor}<br>
+                        <b>Cliente:</b> ${dadosVenda.nomeCliente} | <b>CPF:</b> ${document.getElementById('cpf').value}<br>
+                        <b>Contato:</b> ${document.getElementById('tel1').value}
+                    </div>
+                    <div class="print-section" style="margin-top: 15px;">
+                        <b style="font-size: 11px;">PRODUTOS SELECIONADOS:</b><br>
+                        ${produtosHTML}
+                        <hr style="border-top:1px solid #000; margin: 6px 0;">
+                        <div class="print-row"><span style="font-size:12px; font-weight:bold;">VALOR TOTAL:</span> <span class="destaque-valor">${totalBaseTexto}</span></div>
+                    </div>
+                    <div class="print-section" style="text-align:center; margin-top:20px; font-size:11px; border: 2px dashed #000; padding: 10px; font-weight:bold;">
+                        ⚠️ Este orçamento é válido por até 48 horas.
+                    </div>
+                </div>`;
+        } else {
+            divImpressao.innerHTML = `
+                <div class="via-impressao">
+                    <div class="print-title">ÓTICAS AMMO</div>
+                    <div class="print-subtitle">ORDEM DE SERVIÇO - VIA LABORATÓRIO</div>
+                    <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
+                        <b>OS:</b> ${osNumero} | <b>Data:</b> ${dataAtual} | <b>Previsão:</b> ${dataRetiradaFormatada}<br>
+                        <b>Colaborador(a):</b> ${dadosVenda.vendedor}<br>
+                    </div>
+                    <div class="print-section">
+                        <b>PRODUTOS (Armação / Lentes):</b><br>
+                        ${carrinho.map(i => `${i.qtd}x ${i.nome}`).join('<br>')}
+                    </div>
+                    <div class="print-section">
+                        <table class="print-table">
+                            <tr style="background:#ddd"><th colspan="6">VISÃO PARA LONGE</th></tr>
+                            <tr><th>Olho</th><th>Esf</th><th>Cil</th><th>Eixo</th><th>DNP</th><th>Alt</th></tr>
+                            <tr><td><b>OD</b></td><td>${document.getElementById('lOdEsf').value}</td><td>${document.getElementById('lOdCil').value}</td><td>${document.getElementById('lOdEixo').value}</td><td>${document.getElementById('dnpOd').value}</td><td>${document.getElementById('altOd').value}</td></tr>
+                            <tr><td><b>OE</b></td><td>${document.getElementById('lOeEsf').value}</td><td>${document.getElementById('lOeCil').value}</td><td>${document.getElementById('lOeEixo').value}</td><td>${document.getElementById('dnpOe').value}</td><td>${document.getElementById('altOe').value}</td></tr>
+                            <tr style="background:#ddd"><th colspan="6">VISÃO PARA PERTO</th></tr>
+                            <tr><th>Olho</th><th>Esf</th><th>Cil</th><th>Eixo</th><th colspan="2">Adição</th></tr>
+                            <tr><td><b>OD</b></td><td>${document.getElementById('pOdEsf').value}</td><td>${document.getElementById('pOdCil').value}</td><td>${document.getElementById('pOdEixo').value}</td><td colspan="2" rowspan="2" style="vertical-align:middle; font-weight:bold; font-size:12px;">${document.getElementById('adicao').value}</td></tr>
+                            <tr><td><b>OE</b></td><td>${document.getElementById('pOeEsf').value}</td><td>${document.getElementById('pOeCil').value}</td><td>${document.getElementById('pOeEixo').value}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="via-impressao">
+                    <div class="print-title">ÓTICAS AMMO</div>
+                    <div class="print-subtitle">CONTROLE INTERNO - VIA CAIXA</div>
+                    <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
+                        <b>OS:</b> ${osNumero} | <b>Data:</b> ${dataAtual}<br>
+                        <b>Vendedor:</b> ${dadosVenda.vendedor}<br>
+                        <b>Cliente:</b> ${dadosVenda.nomeCliente} | <b>CPF:</b> ${document.getElementById('cpf').value}<br>
+                    </div>
+                    <div class="print-section">
+                        <b>PRODUTOS:</b><br>${produtosHTML}
+                        <hr style="border-top:1px solid #000; margin: 4px 0;">
+                        <div class="print-row"><span>TOTAL DA COMPRA:</span> <span class="destaque-valor">${totalBaseTexto}</span></div>
+                        <div class="print-row"><span>VALOR RECEBIDO:</span> <b>${entradaTexto}</b></div>
+                        <div class="print-row"><span>SALDO DEVEDOR:</span> <span class="destaque-valor">${saldoTexto} ${textParcelaExtra}</span></div>
+                        <div class="print-row"><span>FORMA DE PGTO:</span> <b>${dadosVenda.formaPagamento}</b></div>
+                    </div>
+                    <div class="termo-entrega">
+                        <div class="termo-titulo">TERMO DE CONFERÊNCIA E RETIRADA</div>
+                        <div class="termo-desc">Preencher no ato da retirada:</div>
+                        <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Óculos entregue em perfeito estado?</div>
+                        <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Recebeu a receita oftálmica original de volta?</div>
+                        <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Realizou o teste de visão (Longe e Perto)?</div>
+                    </div>
+                    <div class="assinatura-box">
+                        <div class="assinatura-linha">Assinatura do Cliente</div>
+                        <div class="assinatura-linha">Assinatura do Caixa</div>
+                    </div>
+                </div>
+                <div class="via-impressao">
+                    <div class="print-title">ÓTICAS AMMO</div>
+                    <div class="print-subtitle">COMPROVANTE DO CLIENTE</div>
+                    <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
+                        <b>OS:</b> ${osNumero} | <b>Data:</b> ${dataAtual}<br>
+                        <b>Vendedor:</b> ${dadosVenda.vendedor}<br>
+                        <b>Previsão de Retirada:</b> <span style="font-size:12px; font-weight:bold;">${dataRetiradaFormatada}</span>
+                    </div>
+                    <div class="print-section">
+                        <b>DESCRIÇÃO:</b><br>${produtosHTML}
+                        <hr style="border-top:1px solid #000; margin: 4px 0;">
+                        <div class="print-row"><span>TOTAL DA COMPRA:</span> <span class="destaque-valor">${totalBaseTexto}</span></div>
+                        <div class="print-row"><span>VALOR PAGO (Entrada):</span> <b>${entradaTexto}</b></div>
+                        <div class="print-row" style="background: #e9ecef; padding: 2px;"><span>SALDO DEVEDOR:</span> <span class="destaque-valor">${saldoTexto} ${textParcelaExtra}</span></div>
+                    </div>
+                    <div class="print-section" style="text-align:center; margin-top:10px; font-size:9px; border: 1px dashed #000; padding: 4px;">
+                        <b>Obrigado pela preferência!</b><br>
+                        A apresentação deste comprovante é obrigatória para a retirada.
+                    </div>
+                </div>`;
+        }
+    }
+
+    async function processarOperacao(tipoOperacao) {
+        if(carrinho.length === 0) { alert("Adicione produtos ao carrinho antes de prosseguir!"); return; }
+        
+        const nomeParaSalvar = vendedorConfirmado || document.getElementById('vendedor').value;
+        if(!nomeParaSalvar) { alert("Erro: Nome do consultor perdido. Volte ao passo 1 e confira."); return; }
+
+        const btn = tipoOperacao === 'venda' ? document.getElementById('btnFinalVenda') : null;
+        if(btn) {
+            btn.disabled = true;
+            btn.innerHTML = "GERANDO E ENVIANDO... <i class='fas fa-spinner fa-spin ms-2'></i>";
+        }
+
+        const idPedidoUnico = "AMMO-" + Date.now().toString().slice(-6);
+        const condicao = document.querySelector('input[name="condicao"]:checked').value;
+        const entrada = parseFloat(document.getElementById('valorEntrada').value) || 0;
+        const parcelasInt = parseInt(document.getElementById('qtdParcelas').value) || 1;
+        const saldoValor = parseFloat(document.getElementById('vSaldoDisplay').dataset.valor) || 0;
+
+        let condicaoEnvio = condicao;
+        let parcelasEnvio = "";
+
+        if (entrada > 0) {
+            condicaoEnvio = "Parcial (" + condicao + ")";
+            parcelasEnvio = `Entrada: R$ ${entrada.toFixed(2)} | Restante: ${(condicao === 'Parcelado' ? parcelasInt+'x' : 'À Vista')} (Saldo: R$ ${saldoValor.toFixed(2)})`;
+        } else {
+            parcelasEnvio = condicao === 'Parcelado' ? parcelasInt + "x" : "1x";
+        }
+        
+        let valorBaseDaCompra = parseFloat(document.getElementById('vTotalDisplay').dataset.valor) || 0;
+        let valorGeral = (condicao === 'Parcelado' && parcelasInt > 1) ? (entrada + saldoValor) : valorBaseDaCompra;
+        let saldoRealParaPlanilha = (condicao === 'A Vista' && entrada === 0) ? valorBaseDaCompra : saldoValor;
+
+        const dadosEnvio = {
+            tipo: tipoOperacao, 
+            idVenda: idPedidoUnico,
+            vendedor: nomeParaSalvar,
+            nomeCliente: document.getElementById('nome').value || "Cliente não identificado",
+            cpf: document.getElementById('cpf').value,
+            telefone: document.getElementById('tel1').value,
+            endereco: document.getElementById('rua').value + ", " + document.getElementById('numero').value + " - " + document.getElementById('bairro').value,
+            itens: carrinho,
+            subtotal: document.getElementById('subtotal').value,
+            desconto: document.getElementById('vDesconto').value || 0,
+            acrescimo: document.getElementById('vAcrescimo').value || 0,
+            valorTotal: valorGeral.toFixed(2),
+            formaPagamento: document.getElementById('formaPgto').value,
+            condicao: condicaoEnvio,
+            parcelas: parcelasEnvio,
+            parcelasNum: parcelasInt,      
+            valorPago: entrada,            
+            saldoDevedor: saldoRealParaPlanilha        
+        };
+
+        try {
+            // DUPLO ENVIO (WRITE): Envia para o Banco Central invisivelmente e processa no Banco Local
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) }).catch(e => console.error("Falha ao salvar no Servidor Geral", e));
+            await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) });
+            
+            montarHtmlImpressao(dadosEnvio);
+            
+            setTimeout(() => {
+                window.print();
+                alert("Operação finalizada! Retornando ao menu principal.");
+                window.location.href = 'menu1.html'; // Redireciona para a página de menu
+            }, 500);
+            
+        } catch(e) {
+            alert("Erro de conexão. A venda não foi salva na planilha, tente novamente.");
+            if(btn) { 
+                btn.disabled = false; 
+                btn.innerHTML = "<i class='fas fa-check-circle me-2'></i> FINALIZAR VENDA"; 
+            }
+        }
+    }
+    
+    // Transições de form (SALVAR CLIENTE)
+    document.getElementById('formPDV').onsubmit = async (e) => {
+        e.preventDefault(); 
+        const sel = document.getElementById('vendedor');
+        if (sel.selectedIndex === -1 || sel.options[sel.selectedIndex].value === "") { 
+            alert("Por favor, selecione seu nome antes de continuar!"); return; 
+        }
+        vendedorConfirmado = sel.options[sel.selectedIndex].value;
+
+        const btn = document.getElementById('btnSalvarCliente'); 
+        btn.disabled = true; 
+        btn.innerHTML = "SALVANDO...";
+        
+        const dados = { 
+            tipo: 'cad_cliente', 
+            vendedor: vendedorConfirmado, 
+            nome: document.getElementById('nome').value, 
+            nascimento: document.getElementById('nascimento').value, 
+            cpf: document.getElementById('cpf').value, 
+            cep: document.getElementById('cep').value,
+            rua: document.getElementById('rua').value,
+            numero: document.getElementById('numero').value,
+            bairro: document.getElementById('bairro').value,
+            complemento: document.getElementById('complemento').value,
+            cidade: document.getElementById('cidade_uf').value,
+            sexo: document.querySelector('input[name="sexo"]:checked').value, 
+            email: document.getElementById('email').value, 
+            tel1: document.getElementById('tel1').value, 
+            tel2: document.getElementById('tel2').value, 
+            obs: document.getElementById('obs').value 
+        };
+        
+        try { 
+            // DUPLO ENVIO (WRITE): Envia para o Banco Central e Processa no Banco Local
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha ao salvar no Servidor Geral", e));
+            await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }); 
+            
+            navegarAbas('receita');
+            document.querySelectorAll('.nomeClienteDisplay').forEach(el => el.innerText = dados.nome); 
+        } catch(err) { } finally {
+            btn.disabled = false;
+            btn.innerHTML = "Avançar para Receita <i class='fas fa-arrow-right ms-2'></i>";
+        }
+    };
+
+    // (SALVAR RECEITA)
+    async function enviarReceita() {
+        const btn = document.getElementById('btnSalvarReceita'); 
+        btn.disabled = true; 
+        btn.innerHTML = "ENVIANDO...";
+        const dados = { 
+            tipo: 'receita', 
+            nomeCliente: document.getElementById('nome').value, 
+            medico: document.getElementById('medico').value, 
+            dataReceita: document.getElementById('dataReceita').value, 
+            lOdEsf: document.getElementById('lOdEsf').value, lOdCil: document.getElementById('lOdCil').value, lOdEixo: document.getElementById('lOdEixo').value, 
+            lOeEsf: document.getElementById('lOeEsf').value, lOeCil: document.getElementById('lOeCil').value, lOeEixo: document.getElementById('lOeEixo').value, 
+            adicao: document.getElementById('adicao').value, 
+            pOdEsf: document.getElementById('pOdEsf').value, pOdCil: document.getElementById('pOdCil').value, pOdEixo: document.getElementById('pOdEixo').value, 
+            pOeEsf: document.getElementById('pOeEsf').value, pOeCil: document.getElementById('pOeCil').value, pOeEixo: document.getElementById('pOeEixo').value, 
+            dnpOd: document.getElementById('dnpOd').value, dnpOe: document.getElementById('dnpOe').value, 
+            altOd: document.getElementById('altOd').value, altOe: document.getElementById('altOe').value 
+        };
+        try { 
+            // DUPLO ENVIO (WRITE): Envia para o Banco Central e Processa no Banco Local
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha ao salvar no Servidor Geral", e));
+            await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }); 
+            
+            navegarAbas('vendas');
+        } catch(err) { } finally {
+            btn.disabled = false;
+            btn.innerHTML = "Ir para Orçamento <i class='fas fa-arrow-right ms-2'></i>";
+        }
+    }
+
+    function calcularPerto() {
+        const adicaoStr = document.getElementById('adicao').value.replace(',', '.');
+        const adicao = parseFloat(adicaoStr);
+        if (!isNaN(adicao) && adicao > 0) {
+            const lOdEsf = parseFloat(document.getElementById('lOdEsf').value.replace(',', '.')) || 0; 
+            const lOeEsf = parseFloat(document.getElementById('lOeEsf').value.replace(',', '.')) || 0;
+            let resOd = lOdEsf + adicao; 
+            let resOe = lOeEsf + adicao;
+            document.getElementById('pOdEsf').value = (resOd > 0 ? "+" : "") + resOd.toFixed(2); 
+            document.getElementById('pOeEsf').value = (resOe > 0 ? "+" : "") + resOe.toFixed(2);
+            document.getElementById('pOdCil').value = document.getElementById('lOdCil').value; 
+            document.getElementById('pOdEixo').value = document.getElementById('lOdEixo').value;
+            document.getElementById('pOeCil').value = document.getElementById('lOeCil').value; 
+            document.getElementById('pOeEixo').value = document.getElementById('lOeEixo').value;
+        } else { 
+            ['pOdEsf', 'pOeEsf', 'pOdCil', 'pOdEixo', 'pOeCil', 'pOeEixo'].forEach(id => document.getElementById(id).value = "");
+        }
+    }
+
+    ['lOdEsf', 'lOeEsf', 'lOdCil', 'lOeCil', 'lOdEixo', 'lOeEixo', 'adicao'].forEach(id => { 
+        const input = document.getElementById(id);
+        if(input) { input.addEventListener('input', calcularPerto); input.addEventListener('keyup', calcularPerto); }
+    });
+</script>
+</body>
+</html>

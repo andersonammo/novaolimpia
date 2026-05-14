@@ -676,3 +676,681 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/dashammo/manifest.json">
+<meta name="theme-color" content="#2c3e50">
+  <title>AMMO - Portal do Consultor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .fade-out { animation: fadeOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); visibility: hidden; } }
+    
+    .glass-bar { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+  </style>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden font-sans selection:bg-blue-500 selection:text-white relative">
+
+  <!-- ==========================================
+       TELA DE AVISO DE FIM DE EXPEDIENTE (18h30)
+       ========================================== -->
+  <div id="tela-aviso-logout" class="absolute inset-0 z-[100] flex items-center justify-center bg-red-900/90 backdrop-blur-md transition-all duration-500 hidden opacity-0">
+    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md text-center transform scale-95 transition-transform duration-500" id="box-aviso">
+      <div class="text-6xl mb-4 animate-bounce">⚠️</div>
+      <h2 class="text-3xl font-black text-red-600 tracking-tight mb-2">Fim do Expediente!</h2>
+      <p class="text-gray-600 font-bold mb-6 text-sm">O sistema será desconectado automaticamente em:</p>
+      
+      <div class="text-7xl font-black text-red-600 mb-2 tabular-nums" id="contadorLogout">15</div>
+      <p class="text-xs font-extrabold text-gray-400 uppercase tracking-widest">segundos</p>
+      
+      <div class="mt-8 w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+        <div id="barraProgressoLogout" class="bg-red-500 h-full rounded-full transition-all duration-1000 ease-linear" style="width: 100%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       TELA DE LOGIN
+       ========================================== -->
+  <div id="tela-login" class="absolute inset-0 z-50 flex items-center justify-center bg-[#0A192F] transition-all">
+    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md relative overflow-hidden">
+      <div class="absolute -top-20 -right-20 w-48 h-48 bg-yellow-400 rounded-full blur-3xl opacity-20"></div>
+      
+      <div class="text-center mb-8 relative z-10">
+        <div class="inline-block py-3 px-8 bg-yellow-400 rounded-xl mb-4 shadow-md border-b-4 border-yellow-500">
+          <h1 class="text-5xl font-black tracking-widest text-red-600 drop-shadow-sm">AMMO</h1>
+        </div>
+        <p class="text-gray-500 font-bold uppercase tracking-widest text-xs">Acesso Restrito - Consultores</p>
+      </div>
+
+      <form id="loginForm" class="space-y-5 relative z-10">
+        <div>
+          <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-1">Usuário</label>
+          <input type="text" id="usuarioLogin" required 
+            class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl font-bold text-gray-800 transition-all outline-none"
+            placeholder="Digite seu login">
+        </div>
+
+        <div>
+          <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-1">Senha</label>
+          <input type="password" id="senhaLogin" required 
+            class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl font-bold text-gray-800 transition-all outline-none"
+            placeholder="••••••••">
+        </div>
+
+        <div id="mensagemErroLogin" class="hidden p-4 rounded-xl text-xs font-bold bg-red-50 text-red-700 border-2 border-red-200 text-center"></div>
+
+        <button type="submit" id="btnEntrar"
+          class="w-full flex justify-center items-center py-4 px-4 rounded-2xl text-sm font-black text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-1">
+          Entrar no Sistema
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTAINER PRINCIPAL DO APP
+       ========================================== -->
+  <div id="app-container" class="w-full h-full flex hidden opacity-0 transition-opacity duration-500">
+    
+    <!-- SIDEBAR LATERAL -->
+    <aside class="w-64 lg:w-72 bg-[#0A192F] text-white hidden md:flex flex-col shadow-2xl z-10 border-r border-blue-900/50 h-full">
+      
+      <div class="py-6 text-center bg-yellow-400 border-b border-yellow-500 shadow-md">
+        <h2 class="text-4xl lg:text-5xl font-black tracking-widest text-red-600 drop-shadow-sm">AMMO</h2>
+      </div>
+
+      <!-- Perfil do Consultor -->
+      <div class="p-5 border-b border-white/5 bg-white/[0.02]">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[10px] text-blue-400 uppercase font-extrabold tracking-widest">Consultor</p>
+          <span id="badgeNivel" class="flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black bg-gray-600 text-white shadow-[0_0_10px_rgba(156,163,175,0.3)] transition-all">
+            ⏳ CARREGANDO...
+          </span>
+        </div>
+        <h3 class="text-xl lg:text-2xl font-black text-white truncate tracking-tight" id="nomeConsultorSide">...</h3>
+      </div>
+
+      <!-- Metas -->
+      <div class="flex-1 p-5 space-y-5 overflow-y-auto custom-scrollbar">
+        <p class="text-[10px] text-blue-400 uppercase font-extrabold tracking-widest mb-3">Progresso de Metas</p>
+        
+        <!-- Semanal -->
+        <div class="group">
+          <div class="flex justify-between text-xs mb-1 items-end">
+            <span class="text-white font-bold tracking-wide group-hover:text-pink-400 transition-colors text-[11px]">🔥 Semanal</span>
+            <span id="pctSemanal" class="text-pink-400 font-black text-xs">0%</span>
+          </div>
+          <div class="w-full glass-bar rounded-full h-2 overflow-hidden mb-1">
+            <div id="barSemanal" class="bg-gradient-to-r from-pink-500 to-rose-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+          </div>
+          <div class="text-[9px] text-gray-400 text-right font-medium" id="txtSemanal">R$ 0,00 / Meta: R$ 6.000,00</div>
+        </div>
+
+        <!-- Quinzenal -->
+        <div class="group">
+          <div class="flex justify-between text-xs mb-1 items-end">
+            <span class="text-white font-bold tracking-wide group-hover:text-cyan-400 transition-colors text-[11px]">⚡ Quinzenal</span>
+            <span id="pctQuinzenal" class="text-cyan-400 font-black text-xs">0%</span>
+          </div>
+          <div class="w-full glass-bar rounded-full h-2 overflow-hidden mb-1">
+            <div id="barQuinzenal" class="bg-gradient-to-r from-cyan-500 to-blue-400 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+          </div>
+          <div class="text-[9px] text-gray-400 text-right font-medium" id="txtQuinzenal">R$ 0,00 / Meta: R$ 12.000,00</div>
+        </div>
+
+        <!-- Mensal -->
+        <div class="group">
+          <div class="flex justify-between text-xs mb-1 items-end">
+            <span class="text-white font-bold tracking-wide group-hover:text-yellow-400 transition-colors text-[11px]">🏆 Mensal</span>
+            <span id="pctMensal" class="text-yellow-400 font-black text-xs">0%</span>
+          </div>
+          <div class="w-full glass-bar rounded-full h-2 overflow-hidden mb-1">
+            <div id="barMensal" class="bg-gradient-to-r from-yellow-400 to-amber-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+          </div>
+          <div class="text-[9px] text-gray-400 text-right font-medium" id="txtMensal">R$ 0,00 / Meta: R$ 24.000,00</div>
+        </div>
+      </div>
+
+      <!-- Botões de Ação Inferiores -->
+      <div class="px-5 pb-5 pt-2 flex flex-col gap-2">
+        <!-- Botão Tela Cheia -->
+        <button onclick="alternarTelaCheia()" class="w-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 hover:border-white/20 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 flex justify-center items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+          Alternar Tela Cheia
+        </button>
+        
+        <!-- Botão Sair -->
+        <button onclick="sair()" class="w-full bg-white/5 hover:bg-red-500/20 text-white/50 hover:text-red-400 border border-white/10 hover:border-red-500/50 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 flex justify-center items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          Desconectar
+        </button>
+      </div>
+    </aside>
+
+    <!-- ==========================================
+         CONTEÚDO PRINCIPAL (DASHBOARD)
+         ========================================== -->
+    <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto h-full bg-[#F3F4F6]">
+      
+      <!-- TELA 1: HUB DE AÇÃO -->
+      <div id="tela-home" class="block max-w-7xl mx-auto h-full flex flex-col">
+        
+        <!-- Aviso Diário -->
+        <div class="bg-white rounded-3xl p-5 md:p-6 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden shrink-0">
+          <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 opacity-60"></div>
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="bg-blue-600 text-white text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-widest shadow-md">Aviso Diário</span>
+                <span class="text-gray-400 text-xs font-bold">Diretoria Comercial</span>
+              </div>
+              <h1 class="text-2xl md:text-3xl font-black text-gray-800 tracking-tight leading-tight mb-1">
+                Foco no Fechamento e Ticket Médio! 🚀
+              </h1>
+              <p class="text-gray-500 text-sm leading-snug max-w-3xl font-medium">
+                Equipe, o foco hoje é trabalhar a <strong class="text-blue-600">venda de valor agregado</strong>. O pódio mensal está aberto, acelerem!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4 flex items-center justify-between shrink-0">
+          <h2 class="text-lg font-black text-gray-800 tracking-tight">Aplicativos do Consultor</h2>
+          <span class="text-xs font-bold text-gray-400">Selecione uma ação 👇</span>
+        </div>
+
+        <!-- 8 Cards de Ação -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-5 flex-1 min-h-0 pb-4">
+          <button onclick="window.location.href='./menu1.html'" class="group text-left bg-gradient-to-br from-blue-600 to-blue-900 rounded-2xl p-4 lg:p-5 shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20"></div>
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl shadow-inner border border-white/20 group-hover:scale-110 transition-transform duration-300">🛒</div>
+            <div class="relative z-10 mt-3">
+              <h3 class="text-lg lg:text-xl font-black text-white mb-0.5 tracking-tight leading-tight">Vender Agora</h3>
+              <p class="text-[10px] lg:text-xs text-blue-100 font-medium leading-tight">Sistema local.</p>
+            </div>
+          </button>
+          
+          <button onclick="abrirTelaAniversarios()" class="group text-left bg-gradient-to-br from-teal-400 to-emerald-500 rounded-2xl p-4 lg:p-5 shadow-lg shadow-teal-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">🎂</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Aniversariantes</h3><p class="text-[10px] lg:text-xs text-teal-50">Clientes do dia.</p></div>
+          </button>
+          
+          <button onclick="window.open('https://ammorh.github.io/pontodigital/', '_blank')" class="group text-left bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-2xl p-4 lg:p-5 shadow-lg shadow-purple-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">⏱️</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Ponto Digital</h3><p class="text-[10px] lg:text-xs text-purple-100">Registre sua jornada.</p></div>
+          </button>
+          
+          <button onclick="window.open('https://andersonammo.github.io/ALTA-PERFORMANCE/', '_blank')" class="group text-left bg-gradient-to-br from-orange-400 to-rose-400 rounded-2xl p-4 lg:p-5 shadow-lg shadow-orange-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">📋</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Rotina Diária</h3><p class="text-[10px] lg:text-xs text-orange-50">Alta performance.</p></div>
+          </button>
+          
+          <button onclick="abrirTelaComissoes()" class="group text-left bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-4 lg:p-5 shadow-lg shadow-green-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">💰</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Comissões</h3><p class="text-[10px] lg:text-xs text-green-100">Extrato detalhado.</p></div>
+          </button>
+          
+          <button onclick="window.open('https://andersonammo.github.io/CONECTMOBILE/', '_blank')" class="group text-left bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl p-4 lg:p-5 shadow-lg shadow-indigo-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">🎓</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Escola AMMO</h3><p class="text-[10px] lg:text-xs text-indigo-100">Treinamentos e scripts.</p></div>
+          </button>
+          
+          <button onclick="window.open('https://rankingdeconsultores.github.io/painel/', '_blank')" class="group text-left bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl p-4 lg:p-5 shadow-lg shadow-cyan-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">🏆</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Ranking Consultor</h3><p class="text-[10px] lg:text-xs text-cyan-50">Sua posição geral.</p></div>
+          </button>
+          
+          <!-- BOTÃO ACIONAR GARANTIA ATUALIZADO -->
+          <button onclick="window.open('./GARANTIA.HTML', '_blank')" class="group text-left bg-gradient-to-br from-red-700 to-red-900 rounded-2xl p-4 lg:p-5 shadow-lg shadow-red-800/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+            <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl group-hover:scale-110 transition-transform duration-300 shadow-inner border border-white/20">🏢</div>
+            <div class="mt-3"><h3 class="text-base lg:text-lg font-black text-white mb-0.5 leading-tight">Acionar Garantia</h3><p class="text-[10px] lg:text-xs text-red-100">Resultados globais.</p></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- TELA 2: ANIVERSARIANTES -->
+      <div id="tela-aniversarios" class="hidden max-w-5xl mx-auto pb-10">
+        <header class="flex flex-col mb-6 gap-2">
+          <button onclick="mudarTela('tela-home')" class="text-gray-400 hover:text-teal-600 font-bold flex items-center transition-colors text-xs uppercase tracking-wider w-fit">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Voltar ao Menu
+          </button>
+          <h1 class="text-3xl font-black text-gray-800 tracking-tight">🎂 Clientes Aniversariantes</h1>
+        </header>
+
+        <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden p-6">
+          <div id="loadingAniversarios" class="text-center py-10 text-sm font-bold text-gray-400 animate-pulse">Buscando aniversariantes no banco de dados...</div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse hidden" id="tabelaAniversarios">
+              <thead>
+                <tr class="border-b-2 border-gray-100 text-xs uppercase tracking-wider text-gray-500 bg-gray-50">
+                  <th class="p-4 font-extrabold rounded-tl-xl">Nome do Cliente</th>
+                  <th class="p-4 font-extrabold">Telefone</th>
+                  <th class="p-4 font-extrabold text-right rounded-tr-xl">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="listaAniversariantes" class="text-sm">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA 3: COMISSÕES -->
+      <div id="tela-comissoes" class="hidden max-w-6xl mx-auto pb-10 h-full flex flex-col">
+        <header class="flex flex-col md:flex-row md:justify-between md:items-end mb-6 gap-4 shrink-0">
+          <div>
+            <button onclick="mudarTela('tela-home')" class="text-gray-400 hover:text-green-600 font-bold flex items-center mb-2 transition-colors text-xs uppercase tracking-wider w-fit">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+              Voltar ao Menu
+            </button>
+            <h1 class="text-3xl font-black text-gray-800 tracking-tight">💸 Minhas Comissões</h1>
+          </div>
+          <div>
+            <input type="text" id="filtroComissao" placeholder="Filtrar por OS, Cliente..." class="w-full md:w-64 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition-all shadow-sm">
+          </div>
+        </header>
+        
+        <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-1 flex flex-col min-h-0">
+          <div id="loadingComissoes" class="text-center py-10 text-sm font-bold text-gray-400 animate-pulse">Calculando suas comissões...</div>
+          
+          <div class="overflow-auto custom-scrollbar flex-1">
+            <table class="w-full text-left border-collapse hidden" id="tabelaComissoes">
+              <thead class="sticky top-0 bg-gray-50 z-10 shadow-sm">
+                <tr class="text-xs uppercase tracking-wider text-gray-500">
+                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Nº OS</th>
+                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Data</th>
+                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Cliente</th>
+                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Forma Pagto</th>
+                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Valor Venda</th>
+                  <th class="p-4 font-extrabold border-b-2 border-green-200 text-green-700">Comissão (R$)</th>
+                </tr>
+              </thead>
+              <tbody id="listaComissoes" class="text-sm divide-y divide-gray-100">
+                <!-- Preenchido via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==========================================
+       SCRIPTS
+       ========================================== -->
+  <script>
+    // 1. Definição das URLs
+    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Apenas recebe dados
+    const URL_BASE_2_PRINCIPAL = 'https://script.google.com/macros/s/AKfycbwZtdxjZZ2fTQnb4OOayADG3-5cvvh1TnDTMghihS53UbvGUJVAT3KL-1GElqRYc2GiNg/exec'; // Leitura e Escrita Local
+
+    // 2. Lista de ações que são APENAS de leitura (buscam dados)
+    const ACOES_LEITURA = ['login', 'buscarMetas', 'listarAniversariantes', 'listarComissoes'];
+
+    // 3. Roteador Inteligente de Banco de Dados
+    async function apiAmmo(payload) {
+      const isLeitura = ACOES_LEITURA.includes(payload.acao);
+
+      if (isLeitura) {
+        // LEITURA: Busca exclusivamente na Base 2 (Principal da unidade)
+        try {
+          const res = await fetch(URL_BASE_2_PRINCIPAL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          return await res.json();
+        } catch (error) {
+          console.error("Erro de leitura na Base Principal:", error);
+          return { status: 'erro', mensagem: 'Falha na comunicação com o banco local.' };
+        }
+      } else {
+        // LANÇAMENTO/ESCRITA: Envia para a Base 2 (Local) e faz um backup na Base 1 (Geral)
+        
+        // Dispara para a Base Geral em background (não trava a tela do consultor)
+        fetch(URL_BASE_1_GERAL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        }).catch(e => console.error("Falha ao salvar no Servidor Geral (Base 1)", e));
+
+        // Aguarda a resposta da Base Principal para dar o feedback na tela
+        try {
+          const resPrincipal = await fetch(URL_BASE_2_PRINCIPAL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          return await resPrincipal.json();
+        } catch (error) {
+          console.error("Erro ao salvar na Base Principal", error);
+          return { status: 'erro', mensagem: 'Erro ao salvar os dados na unidade.' };
+        }
+      }
+    }
+
+    const telaLogin = document.getElementById('tela-login');
+    const appContainer = document.getElementById('app-container');
+
+    window.onload = async function() {
+      const consultor = localStorage.getItem('consultorLogado');
+      if (consultor) { iniciarApp(consultor); }
+      
+      setInterval(verificarHorarioExpediente, 1000);
+    };
+
+    // --- TELA CHEIA (FULLSCREEN) ---
+    function alternarTelaCheia() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log(`Erro ao tentar entrar em tela cheia: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // --- DESCONEXÃO AUTOMÁTICA 18h30 ---
+    let avisoDisparado = false;
+
+    function verificarHorarioExpediente() {
+      const agora = new Date();
+      const horas = agora.getHours();
+      const minutos = agora.getMinutes();
+      
+      if (horas === 18 && minutos === 30 && localStorage.getItem('consultorLogado') && !avisoDisparado) {
+        iniciarContagemLogout();
+      }
+    }
+
+    function iniciarContagemLogout() {
+      avisoDisparado = true;
+      let tempo = 15;
+      
+      const telaAviso = document.getElementById('tela-aviso-logout');
+      const boxAviso = document.getElementById('box-aviso');
+      const contadorEl = document.getElementById('contadorLogout');
+      const barraProgresso = document.getElementById('barraProgressoLogout');
+      
+      telaAviso.classList.remove('hidden');
+      setTimeout(() => {
+        telaAviso.classList.remove('opacity-0');
+        boxAviso.classList.remove('scale-95');
+        boxAviso.classList.add('scale-100');
+      }, 50);
+      
+      contadorEl.innerText = tempo;
+      
+      const intervalo = setInterval(() => {
+        tempo--;
+        contadorEl.innerText = tempo;
+        
+        const porcentagem = (tempo / 15) * 100;
+        barraProgresso.style.width = porcentagem + '%';
+        
+        if (tempo <= 0) {
+          clearInterval(intervalo);
+          
+          telaAviso.classList.add('opacity-0');
+          boxAviso.classList.remove('scale-100');
+          boxAviso.classList.add('scale-95');
+          
+          setTimeout(() => {
+            telaAviso.classList.add('hidden');
+            sair(); 
+          }, 500);
+        }
+      }, 1000);
+    }
+
+    // --- LOGIN ---
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const usuario = document.getElementById('usuarioLogin').value.trim();
+      const senha = document.getElementById('senhaLogin').value.trim();
+      const btnEntrar = document.getElementById('btnEntrar');
+      const divErro = document.getElementById('mensagemErroLogin');
+      
+      btnEntrar.innerText = "Autenticando...";
+      btnEntrar.disabled = true;
+      divErro.classList.add('hidden');
+
+      try {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(e => {});
+        }
+
+        // Validação agora passa pelo Roteador (Consulta apenas a Base 2)
+        const data = await apiAmmo({ acao: 'login', usuario: usuario, senha: senha });
+
+        if (data.status === 'sucesso') {
+          localStorage.setItem('consultorLogado', data.nome);
+          btnEntrar.innerText = "Sucesso!";
+          btnEntrar.classList.replace('bg-blue-600', 'bg-green-500');
+          setTimeout(() => { iniciarApp(data.nome); }, 800);
+        } else {
+          mostrarErroLogin(data.mensagem || "Usuário ou senha inválidos.");
+        }
+      } catch (error) {
+        mostrarErroLogin("Erro de conexão com o banco de dados principal.");
+      } finally {
+        if(btnEntrar.innerText !== "Sucesso!") {
+          btnEntrar.innerText = "Entrar no Sistema";
+          btnEntrar.disabled = false;
+        }
+      }
+    });
+
+    function mostrarErroLogin(texto) {
+      const divErro = document.getElementById('mensagemErroLogin');
+      divErro.innerText = texto;
+      divErro.classList.remove('hidden');
+    }
+
+    // --- TRANSIÇÃO E ATUALIZAÇÃO DE METAS ---
+    function iniciarApp(nomeCompleto) {
+      const primeiroNome = nomeCompleto.split(' ')[0];
+      document.getElementById('nomeConsultorSide').innerText = primeiroNome;
+      
+      telaLogin.classList.add('fade-out');
+      setTimeout(() => {
+        telaLogin.classList.add('hidden');
+        appContainer.classList.remove('hidden');
+        setTimeout(() => { appContainer.classList.add('opacity-100'); }, 50);
+      }, 400);
+
+      carregarMetas(nomeCompleto);
+    }
+
+    async function carregarMetas(consultor) {
+      try {
+        // Passa pelo roteador (Consulta apenas Base 2)
+        const data = await apiAmmo({ acao: 'buscarMetas', consultor: consultor });
+        
+        let vendas = data.vendas || { semanal: 0, quinzenal: 0, mensal: 0 };
+        atualizarPainelMetas(vendas.semanal, vendas.quinzenal, vendas.mensal);
+      } catch (error) {
+        atualizarPainelMetas(0, 0, 0);
+      }
+    }
+
+    function atualizarPainelMetas(vSemanal, vQuinzenal, vMensal) {
+      const mSemanal = 6000;
+      const mQuinzenal = 12000;
+      const mMensal = 24000;
+
+      const pctSem = Math.min((vSemanal / mSemanal) * 100, 100) || 0;
+      const pctQui = Math.min((vQuinzenal / mQuinzenal) * 100, 100) || 0;
+      const pctMen = Math.min((vMensal / mMensal) * 100, 100) || 0;
+
+      const badge = document.getElementById('badgeNivel');
+      if (vMensal <= 10000) {
+        badge.innerHTML = '🥉 BRONZE';
+        badge.className = 'flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black bg-gradient-to-r from-amber-600 to-orange-800 text-white shadow-md transition-all';
+      } else if (vMensal <= 20000) {
+        badge.innerHTML = '🥈 PRATA';
+        badge.className = 'flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900 shadow-md transition-all';
+      } else {
+        badge.innerHTML = '🥇 OURO';
+        badge.className = 'flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black bg-gradient-to-r from-yellow-300 to-yellow-600 text-yellow-950 shadow-[0_0_10px_rgba(234,179,8,0.3)] transition-all';
+      }
+
+      const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+      document.getElementById('pctSemanal').innerText = pctSem.toFixed(0) + '%';
+      document.getElementById('barSemanal').style.width = pctSem + '%';
+      document.getElementById('txtSemanal').innerText = `${BRL.format(vSemanal)} / Meta: ${BRL.format(mSemanal)}`;
+
+      document.getElementById('pctQuinzenal').innerText = pctQui.toFixed(0) + '%';
+      document.getElementById('barQuinzenal').style.width = pctQui + '%';
+      document.getElementById('txtQuinzenal').innerText = `${BRL.format(vQuinzenal)} / Meta: ${BRL.format(mQuinzenal)}`;
+
+      document.getElementById('pctMensal').innerText = pctMen.toFixed(0) + '%';
+      document.getElementById('barMensal').style.width = pctMen + '%';
+      document.getElementById('txtMensal').innerText = `${BRL.format(vMensal)} / Meta: ${BRL.format(mMensal)}`;
+    }
+
+    function sair() {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(e => {});
+      }
+
+      localStorage.removeItem('consultorLogado');
+      document.getElementById('loginForm').reset();
+      document.getElementById('btnEntrar').classList.replace('bg-green-500', 'bg-blue-600');
+      document.getElementById('btnEntrar').innerText = "Entrar no Sistema";
+      document.getElementById('btnEntrar').disabled = false;
+      
+      appContainer.classList.remove('opacity-100');
+      setTimeout(() => {
+        appContainer.classList.add('hidden');
+        telaLogin.classList.remove('hidden', 'fade-out');
+        telaLogin.classList.add('fade-in');
+        mudarTela('tela-home');
+        
+        document.getElementById('badgeNivel').innerHTML = '⏳ CARREGANDO...';
+        document.getElementById('badgeNivel').className = 'flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black bg-gray-600 text-white transition-all';
+        ['Semanal', 'Quinzenal', 'Mensal'].forEach(t => {
+          document.getElementById('pct' + t).innerText = '0%';
+          document.getElementById('bar' + t).style.width = '0%';
+        });
+
+        avisoDisparado = false; 
+
+      }, 400);
+    }
+
+    // --- NAVEGAÇÃO ---
+    function mudarTela(idTela) {
+      ['tela-home', 'tela-aniversarios', 'tela-comissoes'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.classList.add('hidden');
+            el.classList.remove('fade-in');
+        }
+      });
+      const telaAtiva = document.getElementById(idTela);
+      telaAtiva.classList.remove('hidden');
+      telaAtiva.classList.add('fade-in');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- ANIVERSARIANTES ---
+    async function abrirTelaAniversarios() {
+      mudarTela('tela-aniversarios');
+      document.getElementById('tabelaAniversarios').classList.add('hidden');
+      document.getElementById('loadingAniversarios').classList.remove('hidden');
+      try {
+        // Passa pelo roteador (Consulta apenas Base 2)
+        const data = await apiAmmo({ acao: 'listarAniversariantes', consultor: localStorage.getItem('consultorLogado') });
+        
+        const tbody = document.getElementById('listaAniversariantes');
+        tbody.innerHTML = '';
+        
+        if (data.status === 'sucesso' && data.dados && data.dados.length > 0) {
+          data.dados.forEach(cliente => {
+            const zapLink = `https://wa.me/55${cliente.telefone.replace(/\D/g, '')}?text=Olá ${cliente.nome}, feliz aniversário! 🎉 Tem um presente especial esperando por você hoje.`;
+            tbody.innerHTML += `
+              <tr class="hover:bg-teal-50/50 transition-colors">
+                <td class="p-4 font-bold text-gray-800">${cliente.nome}</td>
+                <td class="p-4 text-gray-600 font-medium">${cliente.telefone}</td>
+                <td class="p-4 text-right">
+                  <a href="${zapLink}" target="_blank" class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 hover:bg-green-500 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                    WhatsApp
+                  </a>
+                </td>
+              </tr>
+            `;
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-400 font-bold">Nenhum aniversariante hoje.</td></tr>';
+        }
+        document.getElementById('loadingAniversarios').classList.add('hidden');
+        document.getElementById('tabelaAniversarios').classList.remove('hidden');
+      } catch (error) {
+        document.getElementById('loadingAniversarios').innerText = "Erro ao buscar aniversariantes.";
+      }
+    }
+
+    // --- COMISSÕES ---
+    async function abrirTelaComissoes() {
+      mudarTela('tela-comissoes');
+      document.getElementById('tabelaComissoes').classList.add('hidden');
+      document.getElementById('loadingComissoes').classList.remove('hidden');
+      try {
+        // Passa pelo roteador (Consulta apenas Base 2)
+        const data = await apiAmmo({ acao: 'listarComissoes', consultor: localStorage.getItem('consultorLogado') });
+        
+        const tbody = document.getElementById('listaComissoes');
+        tbody.innerHTML = '';
+        
+        if (data.status === 'sucesso' && data.dados && data.dados.length > 0) {
+          data.dados.forEach(venda => {
+            tbody.innerHTML += `
+              <tr class="hover:bg-green-50/50 transition-colors linha-comissao">
+                <td class="p-4 font-mono font-bold text-gray-500">#${venda.os}</td>
+                <td class="p-4 text-gray-600 font-medium whitespace-nowrap">${venda.data}</td>
+                <td class="p-4 font-bold text-gray-800">${venda.cliente}</td>
+                <td class="p-4 text-xs"><span class="bg-gray-100 text-gray-600 px-2 py-1.5 rounded-lg font-bold">${venda.pagamento}</span></td>
+                <td class="p-4 text-gray-700 font-medium">R$ ${parseFloat(venda.valorVenda).toFixed(2)}</td>
+                <td class="p-4 font-black text-green-600">R$ ${parseFloat(venda.comissao).toFixed(2)}</td>
+              </tr>
+            `;
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">Nenhuma venda encontrada para este período.</td></tr>';
+        }
+        document.getElementById('loadingComissoes').classList.add('hidden');
+        document.getElementById('tabelaComissoes').classList.remove('hidden');
+      } catch (error) {
+        document.getElementById('loadingComissoes').innerText = "Erro ao buscar comissões.";
+      }
+    }
+
+    document.getElementById('filtroComissao').addEventListener('keyup', function(e) {
+      const termo = e.target.value.toLowerCase();
+      const linhas = document.querySelectorAll('.linha-comissao');
+      linhas.forEach(linha => {
+        const texto = linha.innerText.toLowerCase();
+        linha.style.display = texto.includes(termo) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

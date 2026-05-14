@@ -9,6 +9,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Biblioteca para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         :root { 
             --ammo-navy: #0A2342; 
@@ -38,7 +41,7 @@
         /* Card Principal Tela Cheia */
         .card { 
             border: none; 
-            border-radius: 0; /* Removido arredondamento para encostar nas bordas */
+            border-radius: 0;
             box-shadow: none; 
             margin-bottom: 0; 
             height: 100%;
@@ -58,7 +61,7 @@
         
         .card-body {
             flex-grow: 1;
-            overflow-y: auto; /* Permite rolar apenas o conteúdo interno */
+            overflow-y: auto;
             padding: 30px !important;
         }
 
@@ -67,7 +70,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 30px;
-            padding: 0 10%; /* Ajuste para não ficar colado nas bordas laterais na tela cheia */
+            padding: 0 10%;
             position: relative;
         }
         .stepper-wrapper::before {
@@ -211,34 +214,155 @@
         .total-box .text-gold { color: var(--ammo-gold); }
 
         /* ==========================================
-           LAYOUT DE IMPRESSÃO COMPACTO A4
+           LAYOUT DE IMPRESSÃO - A4 PREENCHIDO (LETRAS MAIORES)
            ========================================== */
-        @media print {
-            @page { margin: 5mm; } 
-            body * { visibility: hidden; }
-            #areaImpressao, #areaImpressao * { visibility: visible; }
-            #areaImpressao {
-                position: absolute; left: 0; top: 0; width: 100%;
-                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #000;
-            }
-            .via-impressao { border: 1px solid #000; border-radius: 5px; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; }
-            .print-title { text-align: center; font-weight: 900; font-size: 13px; margin-bottom: 4px; letter-spacing: 1px; border-bottom: 1px solid #000; padding-bottom: 3px; }
-            .print-subtitle { text-align: center; font-size: 11px; font-weight: bold; margin-top: -2px; margin-bottom: 6px; color: #444; }
-            .print-section { margin-bottom: 6px; line-height: 1.2; }
-            .print-section b { color: #222; }
-            .print-row { display: flex; justify-content: space-between; margin-bottom: 3px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
-            .print-row:last-child { border-bottom: none; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 4px; margin-bottom: 4px; }
-            .print-table th, .print-table td { border: 1px solid #000; padding: 2px; text-align: center; font-size: 9px; }
-            .print-table th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
-            .termo-entrega { margin-top: 8px; border: 1px solid #000; padding: 6px; border-radius: 5px; background-color: #f9f9f9 !important; -webkit-print-color-adjust: exact; }
-            .termo-titulo { text-align: center; font-weight: 900; font-size: 10px; margin-bottom: 3px; }
-            .termo-desc { text-align: center; font-size: 9px; margin-bottom: 6px; font-style: italic; }
-            .check-item { display: flex; align-items: center; margin-bottom: 4px; font-weight: bold; font-size: 9px; }
-            .check-box { margin-right: 10px; font-weight: normal; }
-            .assinatura-box { margin-top: 20px; display: flex; justify-content: space-around; }
-            .assinatura-linha { border-top: 1px solid #000; width: 40%; text-align: center; padding-top: 3px; font-weight: bold; font-size: 9px; }
-            .destaque-valor { font-size: 12px; font-weight: 900; }
+        #areaImpressao {
+            font-family: 'Inter', Helvetica, sans-serif;
+            color: #111;
+            background: #fff;
+            width: 790px; /* Largura perfeita para A4 */
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .pdf-via {
+            padding: 12px 18px; /* Aumentado o espaço interno */
+            margin-bottom: 22px; /* Aumentado o distanciamento entre vias */
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            position: relative;
+            background-color: #fff;
+            page-break-inside: avoid;
+        }
+
+        /* Linha de corte entre as vias */
+        .pdf-via:not(:last-child)::after {
+            content: '✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #adb5bd;
+            font-size: 12px; /* Tesoura maior */
+            letter-spacing: 2px;
+        }
+
+        .pdf-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--ammo-navy);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .pdf-logo {
+            max-height: 42px; /* Logo maior */
+            object-fit: contain;
+        }
+        
+        .pdf-title-box { text-align: right; }
+        .pdf-title {
+            font-size: 16px; /* Letra muito maior */
+            font-weight: 800;
+            color: var(--ammo-navy);
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+        .pdf-via-name {
+            font-size: 11px; /* Letra maior */
+            font-weight: 700;
+            color: #fff;
+            background: var(--ammo-navy);
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        
+        /* Grid de 3 colunas compactas mas com letras grandes */
+        .pdf-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 11px; /* FONTE AUMENTADA */
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        .pdf-info-grid span { display: block; margin-bottom: 3px;}
+        .pdf-info-grid strong { color: var(--ammo-navy); }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px; /* FONTE AUMENTADA */
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #dee2e6;
+            padding: 6px 8px; /* Mais espaço na célula */
+            text-align: left;
+        }
+        .pdf-table th {
+            background-color: var(--ammo-navy) !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px; /* FONTE AUMENTADA */
+            -webkit-print-color-adjust: exact;
+        }
+        .pdf-table td.center { text-align: center; }
+        .pdf-table td.right { text-align: right; }
+        
+        /* Box Financeiro em Linha Única para economizar espaço mas com letra boa */
+        .pdf-totals-inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            font-size: 12px; /* FONTE AUMENTADA */
+            font-weight: bold;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .pdf-termo {
+            font-size: 11px; /* FONTE AUMENTADA */
+            border: 1px solid #ced4da;
+            background: #fdfdfd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pdf-signatures { display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 5px; }
+        .pdf-sign-line {
+            width: 40%;
+            border-top: 1px solid #333;
+            text-align: center;
+            font-size: 11px; /* FONTE AUMENTADA */
+            font-weight: 600;
+            padding-top: 4px;
+        }
+        
+        .pdf-footer-msg {
+            text-align: center;
+            font-size: 11px; /* FONTE AUMENTADA */
+            font-weight: 600;
+            color: #555;
+            margin-top: 8px;
+            padding: 6px;
+            border-top: 1px dashed #ccc;
         }
     </style>
 </head>
@@ -561,9 +685,9 @@
                                     
                                     <div class="row mb-4 fade-in" id="divParcelas" style="display:none;">
                                         <div class="col-12">
-                                            <label>Nº de Parcelas do Saldo <small class="text-primary ms-1">(+2% de juros/parcela)</small></label>
+                                            <label>Nº de Parcelas do Saldo</label>
                                             <select class="form-select border-warning shadow-sm" id="qtdParcelas" onchange="calcularTotalVenda()">
-                                                <option value="1">1x (Sem juros)</option>
+                                                <option value="1">1x</option>
                                                 <option value="2">2x</option>
                                                 <option value="3">3x</option>
                                                 <option value="4">4x</option>
@@ -633,10 +757,10 @@
 <script src="https://unpkg.com/imask"></script>
 <script>
     // ==========================================
-    // CONFIGURAÇÕES GERAIS E VARIÁVEIS (ATUALIZADO PARA BANCO DUPLO)
+    // CONFIGURAÇÕES GERAIS E VARIÁVEIS 
     // ==========================================
-    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Servidor Central (Backup invisível)
-    const URL_BASE_2_PRINCIPAL = "https://script.google.com/macros/s/AKfycbzciM5IA25tZ9CcRkwj0-okP5CQ0IG3wpmZeT40vbPGiCtovD3au5Ccgr9jTxcJhSc6/exec"; // Servidor Local (Leitura e Escrita principal)
+    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Servidor Central
+    const URL_BASE_2_PRINCIPAL = "https://script.google.com/macros/s/AKfycbzciM5IA25tZ9CcRkwj0-okP5CQ0IG3wpmZeT40vbPGiCtovD3au5Ccgr9jTxcJhSc6/exec"; // Servidor Local
 
     let estoqueGlobal = []; 
     let carrinho = [];
@@ -655,7 +779,7 @@
         const select = document.getElementById('vendedor'); 
         select.innerHTML = '<option value="">Carregando...</option>';
         
-        // LEITURA INICIAL: Busca os dados apenas do Banco Principal (Base 2)
+        // LEITURA INICIAL
         fetch(URL_BASE_2_PRINCIPAL).then(res => res.json()).then(data => {
             if (data.erro) { alert("Erro de conexão: " + data.erro); return; }
             select.innerHTML = '<option value="">Selecione seu nome...</option>';
@@ -684,7 +808,7 @@
     };
 
     // ========================================================
-    // NAVEGAÇÃO ENTRE ABAS (COM BOTÃO DE VOLTAR)
+    // NAVEGAÇÃO ENTRE ABAS
     // ========================================================
     function atualizarStepper(stepNumber) {
         document.querySelectorAll('.step').forEach((el, index) => {
@@ -799,9 +923,9 @@
             const qtdParcelas = parseInt(document.getElementById('qtdParcelas').value) || 1;
             if (qtdParcelas > 1) {
                 let valorParcelaBase = restanteBase / qtdParcelas;
-                let valorParcelaComJuros = valorParcelaBase * 1.02; 
-                saldoDevedorFinal = valorParcelaComJuros * qtdParcelas;
-                textoDescricaoParcelas = `<br><span style="font-size: 1rem; color: #0dcaf0; font-weight: bold; background: white; padding: 4px 10px; border-radius: 6px; margin-top: 8px; display: inline-block;">${qtdParcelas}x de ${valorParcelaComJuros.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>`;
+                // JUROS REMOVIDOS - O saldo final é igual ao restante parcelado
+                saldoDevedorFinal = restanteBase; 
+                textoDescricaoParcelas = `<br><span style="font-size: 1rem; color: #0dcaf0; font-weight: bold; background: white; padding: 4px 10px; border-radius: 6px; margin-top: 8px; display: inline-block;">${qtdParcelas}x de ${valorParcelaBase.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>`;
             }
         }
         
@@ -823,11 +947,28 @@
     function mudarParcelas() {
         const condicao = document.querySelector('input[name="condicao"]:checked').value;
         const divParc = document.getElementById('divParcelas');
+        const formaPgto = document.getElementById('formaPgto');
+
         if(condicao === 'Parcelado') { 
             divParc.style.display = 'flex'; 
+            // Mostra apenas opções compatíveis com parcelamento
+            formaPgto.innerHTML = `
+                <option>Cartão de Crédito</option>
+                <option>Boleto</option>
+                <option>Bonuscred</option>
+            `;
         } else { 
             divParc.style.display = 'none'; 
             document.getElementById('qtdParcelas').value = "1"; 
+            // Restaura todas as opções para A Vista
+            formaPgto.innerHTML = `
+                <option>Dinheiro</option>
+                <option>Pix</option>
+                <option>Cartão de Débito</option>
+                <option>Cartão de Crédito</option>
+                <option>Boleto</option>
+                <option>Bonuscred</option>
+            `;
         }
         calcularTotalVenda();
     }
@@ -855,7 +996,6 @@
         if(this.value.length === 14) {
             this.classList.add('loading-cpf');
             try {
-                // LEITURA DO CPF: Busca dados no Banco Principal (Base 2)
                 const response = await fetch(URL_BASE_2_PRINCIPAL + "?cpf=" + this.value); 
                 const data = await response.json();
                 if(data && data.encontrado) {
@@ -899,127 +1039,226 @@
     }
 
     // ========================================================
-    // PROCESSAMENTO E IMPRESSÃO (COM VOLTA AUTOMÁTICA)
+    // GERAÇÃO DE HTML PARA O PDF (LAYOUT PROFISSIONAL A4 PREENCHIDO E LEGÍVEL)
     // ========================================================
     function montarHtmlImpressao(dadosVenda) {
         const divImpressao = document.getElementById('areaImpressao');
-        document.getElementById('sistemaPDV').style.display = 'none'; 
-        divImpressao.style.display = 'block';
-
+        
+        // ----------------------------------------------------
+        // SUBSTITUA AQUI PELO LINK DA SUA LOGOMARCA OFICIAL
+        // ----------------------------------------------------
+        const urlLogoEmpresa = "https://via.placeholder.com/300x80/0A2342/FFFFFF?text=O+T+I+C+A+S+++A+M+M+O"; 
+        
         const dataAtual = new Date().toLocaleDateString('pt-BR');
         const osNumero = dadosVenda.idVenda; 
         const dataRetiradaFormatada = formatarDataBR(document.getElementById('dataEntrega').value);
+        const vendedor = dadosVenda.vendedor;
+        const nomeCliente = dadosVenda.nomeCliente;
+        const cpfCliente = document.getElementById('cpf').value || 'Não informado';
+        const telCliente = document.getElementById('tel1').value || 'Não informado';
         
-        let produtosHTML = "";
+        // Endereço formatado se preenchido
+        const rua = document.getElementById('rua').value || '';
+        const num = document.getElementById('numero').value || '';
+        const bairro = document.getElementById('bairro').value || '';
+        const cid = document.getElementById('cidade_uf').value || '';
+        const enderecoCliente = rua ? `${rua}, ${num} - ${bairro}, ${cid}` : 'Não informado';
+        
+        // Tabela de Produtos (Linhas)
+        let linhasProdutosHTML = "";
         carrinho.forEach(item => { 
-            produtosHTML += `<div class="print-row"><span>${item.qtd}x ${item.nome}</span> <span>R$ ${(item.valor * item.qtd).toFixed(2)}</span></div>`; 
+            linhasProdutosHTML += `<tr>
+                <td class="center">${item.qtd}</td>
+                <td>${item.nome}</td>
+                <td class="right">R$ ${item.valor.toFixed(2)}</td>
+                <td class="right fw-bold">R$ ${(item.valor * item.qtd).toFixed(2)}</td>
+            </tr>`; 
         });
 
+        // Valores
         const totalBaseTexto = parseFloat(document.getElementById('vTotalDisplay').dataset.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const entradaValor = parseFloat(document.getElementById('valorEntrada').value || 0);
         const entradaTexto = entradaValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const saldoValor = parseFloat(document.getElementById('vSaldoDisplay').dataset.valor || 0);
         const saldoTexto = saldoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const textParcelaExtra = document.getElementById('vSaldoDisplay').dataset.parcelatexto || '';
+        const formaPgto = dadosVenda.formaPagamento;
+
+        // Tabelas de Receita Oftálmica
+        const tabelaReceitaHTML = `
+            <table class="pdf-table">
+                <tr><th colspan="6" class="center">VISÃO PARA LONGE</th></tr>
+                <tr><th class="center">Olho</th><th class="center">Esférico</th><th class="center">Cilíndrico</th><th class="center">Eixo</th><th class="center">DNP</th><th class="center">Altura</th></tr>
+                <tr><td class="center fw-bold">OD</td><td class="center">${document.getElementById('lOdEsf').value}</td><td class="center">${document.getElementById('lOdCil').value}</td><td class="center">${document.getElementById('lOdEixo').value}</td><td class="center">${document.getElementById('dnpOd').value}</td><td class="center">${document.getElementById('altOd').value}</td></tr>
+                <tr><td class="center fw-bold">OE</td><td class="center">${document.getElementById('lOeEsf').value}</td><td class="center">${document.getElementById('lOeCil').value}</td><td class="center">${document.getElementById('lOeEixo').value}</td><td class="center">${document.getElementById('dnpOe').value}</td><td class="center">${document.getElementById('altOe').value}</td></tr>
+                
+                <tr><th colspan="6" class="center">VISÃO PARA PERTO</th></tr>
+                <tr><th class="center">Olho</th><th class="center">Esférico</th><th class="center">Cilíndrico</th><th class="center">Eixo</th><th colspan="2" class="center">Adição (ADD)</th></tr>
+                <tr><td class="center fw-bold">OD</td><td class="center">${document.getElementById('pOdEsf').value}</td><td class="center">${document.getElementById('pOdCil').value}</td><td class="center">${document.getElementById('pOdEixo').value}</td><td colspan="2" rowspan="2" class="center" style="vertical-align:middle; font-weight:800; font-size:14px; background:#f0f0f0;">${document.getElementById('adicao').value}</td></tr>
+                <tr><td class="center fw-bold">OE</td><td class="center">${document.getElementById('pOeEsf').value}</td><td class="center">${document.getElementById('pOeCil').value}</td><td class="center">${document.getElementById('pOeEixo').value}</td></tr>
+            </table>
+        `;
 
         if (dadosVenda.tipo === 'orcamento') {
             divImpressao.innerHTML = `
-                <div class="via-impressao">
-                    <div class="print-title">ÓTICAS AMMO</div>
-                    <div class="print-subtitle" style="font-size: 14px;">ORÇAMENTO DE PRODUTOS</div>
-                    <div class="print-section" style="background:#f0f0f0; padding:8px; border-radius:3px;">
-                        <b>ID:</b> ${osNumero} | <b>Data:</b> ${dataAtual}<br>
-                        <b>Colaborador(a):</b> ${dadosVenda.vendedor}<br>
-                        <b>Cliente:</b> ${dadosVenda.nomeCliente} | <b>CPF:</b> ${document.getElementById('cpf').value}<br>
-                        <b>Contato:</b> ${document.getElementById('tel1').value}
+                <div class="pdf-via">
+                    <div class="pdf-header">
+                        <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
+                        <div class="pdf-title-box">
+                            <h2 class="pdf-title">ORÇAMENTO OFICIAL</h2>
+                            <span class="pdf-via-name">VÁLIDO POR 48 HORAS</span>
+                        </div>
                     </div>
-                    <div class="print-section" style="margin-top: 15px;">
-                        <b style="font-size: 11px;">PRODUTOS SELECIONADOS:</b><br>
-                        ${produtosHTML}
-                        <hr style="border-top:1px solid #000; margin: 6px 0;">
-                        <div class="print-row"><span style="font-size:12px; font-weight:bold;">VALOR TOTAL:</span> <span class="destaque-valor">${totalBaseTexto}</span></div>
+                    <div class="pdf-info-grid">
+                        <div>
+                            <span><strong>Nº Registro:</strong> ${osNumero}</span>
+                            <span><strong>Emissão:</strong> ${dataAtual}</span>
+                        </div>
+                        <div>
+                            <span><strong>Cliente:</strong> ${nomeCliente}</span>
+                            <span><strong>CPF:</strong> ${cpfCliente}</span>
+                        </div>
+                        <div>
+                            <span><strong>Contato:</strong> ${telCliente}</span>
+                            <span><strong>Colaborador(a):</strong> ${vendedor}</span>
+                        </div>
                     </div>
-                    <div class="print-section" style="text-align:center; margin-top:20px; font-size:11px; border: 2px dashed #000; padding: 10px; font-weight:bold;">
-                        ⚠️ Este orçamento é válido por até 48 horas.
+                    <table class="pdf-table">
+                        <tr><th class="center" style="width:10%;">QTD</th><th>DESCRIÇÃO DO PRODUTO</th><th class="right" style="width:20%;">V. UNIT</th><th class="right" style="width:20%;">TOTAL</th></tr>
+                        ${linhasProdutosHTML}
+                    </table>
+                    <div class="pdf-totals-inline">
+                        <span>ORÇAMENTO - ÓTICAS AMMO</span>
+                        <span>VALOR TOTAL: <span style="font-size: 14px; color: var(--ammo-navy);">${totalBaseTexto}</span></span>
                     </div>
                 </div>`;
         } else {
             divImpressao.innerHTML = `
-                <div class="via-impressao">
-                    <div class="print-title">ÓTICAS AMMO</div>
-                    <div class="print-subtitle">ORDEM DE SERVIÇO - VIA LABORATÓRIO</div>
-                    <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
-                        <b>OS:</b> ${osNumero} | <b>Data:</b> ${dataAtual} | <b>Previsão:</b> ${dataRetiradaFormatada}<br>
-                        <b>Colaborador(a):</b> ${dadosVenda.vendedor}<br>
+                <!-- 1. VIA LABORATÓRIO -->
+                <div class="pdf-via">
+                    <div class="pdf-header">
+                        <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
+                        <div class="pdf-title-box">
+                            <h2 class="pdf-title">ORDEM DE SERVIÇO</h2>
+                            <span class="pdf-via-name">1. VIA LABORATÓRIO</span>
+                        </div>
                     </div>
-                    <div class="print-section">
-                        <b>PRODUTOS (Armação / Lentes):</b><br>
-                        ${carrinho.map(i => `${i.qtd}x ${i.nome}`).join('<br>')}
+                    <div class="pdf-info-grid">
+                        <div>
+                            <span><strong>Nº O.S.:</strong> ${osNumero}</span>
+                            <span><strong>Data:</strong> ${dataAtual}</span>
+                            <span><strong>Colab.:</strong> ${vendedor}</span>
+                        </div>
+                        <div>
+                            <span><strong>Previsão:</strong> <b style="color:red;">${dataRetiradaFormatada}</b></span>
+                            <span><strong>Endereço:</strong> ${enderecoCliente}</span>
+                            <span><strong>F. Pgto:</strong> ${formaPgto}</span>
+                        </div>
+                        <div>
+                            <span style="color:green;"><strong>Sinal:</strong> ${entradaTexto}</span>
+                            <span style="color:#d32f2f;"><strong>A Receber:</strong> ${saldoTexto}</span>
+                        </div>
                     </div>
-                    <div class="print-section">
-                        <table class="print-table">
-                            <tr style="background:#ddd"><th colspan="6">VISÃO PARA LONGE</th></tr>
-                            <tr><th>Olho</th><th>Esf</th><th>Cil</th><th>Eixo</th><th>DNP</th><th>Alt</th></tr>
-                            <tr><td><b>OD</b></td><td>${document.getElementById('lOdEsf').value}</td><td>${document.getElementById('lOdCil').value}</td><td>${document.getElementById('lOdEixo').value}</td><td>${document.getElementById('dnpOd').value}</td><td>${document.getElementById('altOd').value}</td></tr>
-                            <tr><td><b>OE</b></td><td>${document.getElementById('lOeEsf').value}</td><td>${document.getElementById('lOeCil').value}</td><td>${document.getElementById('lOeEixo').value}</td><td>${document.getElementById('dnpOe').value}</td><td>${document.getElementById('altOe').value}</td></tr>
-                            <tr style="background:#ddd"><th colspan="6">VISÃO PARA PERTO</th></tr>
-                            <tr><th>Olho</th><th>Esf</th><th>Cil</th><th>Eixo</th><th colspan="2">Adição</th></tr>
-                            <tr><td><b>OD</b></td><td>${document.getElementById('pOdEsf').value}</td><td>${document.getElementById('pOdCil').value}</td><td>${document.getElementById('pOdEixo').value}</td><td colspan="2" rowspan="2" style="vertical-align:middle; font-weight:bold; font-size:12px;">${document.getElementById('adicao').value}</td></tr>
-                            <tr><td><b>OE</b></td><td>${document.getElementById('pOeEsf').value}</td><td>${document.getElementById('pOeCil').value}</td><td>${document.getElementById('pOeEixo').value}</td></tr>
-                        </table>
+                    <table class="pdf-table">
+                        <tr><th class="center" style="width:10%;">QTD</th><th>DESCRIÇÃO DA ARMAÇÃO / LENTES</th></tr>
+                        ${carrinho.map(item => `<tr><td class="center fw-bold">${item.qtd}</td><td>${item.nome}</td></tr>`).join('')}
+                    </table>
+                    ${tabelaReceitaHTML}
+                </div>
+
+                <!-- 2. VIA CAIXA -->
+                <div class="pdf-via">
+                    <div class="pdf-header">
+                        <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
+                        <div class="pdf-title-box">
+                            <h2 class="pdf-title">CONTROLE INTERNO</h2>
+                            <span class="pdf-via-name">2. VIA CAIXA</span>
+                        </div>
+                    </div>
+                    <div class="pdf-info-grid">
+                        <div>
+                            <span><strong>Nº O.S.:</strong> ${osNumero}</span>
+                            <span><strong>Data:</strong> ${dataAtual}</span>
+                        </div>
+                        <div>
+                            <span><strong>Cliente:</strong> ${nomeCliente}</span>
+                            <span><strong>CPF:</strong> ${cpfCliente}</span>
+                        </div>
+                        <div>
+                            <span><strong>Contato:</strong> ${telCliente}</span>
+                            <span><strong>Colab.:</strong> ${vendedor}</span>
+                        </div>
+                    </div>
+                    <table class="pdf-table">
+                        <tr><th class="center" style="width:10%;">QTD</th><th>DESCRIÇÃO DO PRODUTO</th><th class="right" style="width:20%;">V. UNIT</th><th class="right" style="width:20%;">TOTAL</th></tr>
+                        ${linhasProdutosHTML}
+                    </table>
+                    
+                    <div class="pdf-totals-inline">
+                        <span>F. PGTO: ${formaPgto}</span>
+                        <span>TOTAL COMPRA: ${totalBaseTexto}</span>
+                        <span style="color:green;">ENTRADA: ${entradaTexto}</span>
+                        <span style="color:#d32f2f;">SALDO: ${saldoTexto} ${textParcelaExtra}</span>
+                    </div>
+
+                    <div class="pdf-termo">
+                        <strong>CONFERÊNCIA (Na Entrega):</strong>
+                        <span>(&nbsp;&nbsp;&nbsp;) Óculos em perfeito estado</span>
+                        <span>(&nbsp;&nbsp;&nbsp;) Receita original devolvida</span>
+                        <span>(&nbsp;&nbsp;&nbsp;) Teste de visão</span>
+                    </div>
+
+                    <div class="pdf-signatures">
+                        <div class="pdf-sign-line">Assinatura do Cliente</div>
+                        <div class="pdf-sign-line">Assinatura do Responsável (Caixa)</div>
                     </div>
                 </div>
-                <div class="via-impressao">
-                    <div class="print-title">ÓTICAS AMMO</div>
-                    <div class="print-subtitle">CONTROLE INTERNO - VIA CAIXA</div>
-                    <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
-                        <b>OS:</b> ${osNumero} | <b>Data:</b> ${dataAtual}<br>
-                        <b>Vendedor:</b> ${dadosVenda.vendedor}<br>
-                        <b>Cliente:</b> ${dadosVenda.nomeCliente} | <b>CPF:</b> ${document.getElementById('cpf').value}<br>
+
+                <!-- 3. VIA CLIENTE -->
+                <div class="pdf-via" style="margin-bottom: 0; border-bottom: none;">
+                    <div class="pdf-header">
+                        <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
+                        <div class="pdf-title-box">
+                            <h2 class="pdf-title">COMPROVANTE DA COMPRA</h2>
+                            <span class="pdf-via-name" style="background:#198754;">3. VIA DO CLIENTE</span>
+                        </div>
                     </div>
-                    <div class="print-section">
-                        <b>PRODUTOS:</b><br>${produtosHTML}
-                        <hr style="border-top:1px solid #000; margin: 4px 0;">
-                        <div class="print-row"><span>TOTAL DA COMPRA:</span> <span class="destaque-valor">${totalBaseTexto}</span></div>
-                        <div class="print-row"><span>VALOR RECEBIDO:</span> <b>${entradaTexto}</b></div>
-                        <div class="print-row"><span>SALDO DEVEDOR:</span> <span class="destaque-valor">${saldoTexto} ${textParcelaExtra}</span></div>
-                        <div class="print-row"><span>FORMA DE PGTO:</span> <b>${dadosVenda.formaPagamento}</b></div>
+                    <div class="pdf-info-grid">
+                        <div>
+                            <span><strong>Nº O.S.:</strong> ${osNumero}</span>
+                            <span><strong>Data:</strong> ${dataAtual}</span>
+                        </div>
+                        <div>
+                            <span><strong>Cliente:</strong> ${nomeCliente}</span>
+                            <span><strong>Colab.:</strong> ${vendedor}</span>
+                        </div>
+                        <div>
+                            <span><strong>Previsão de Retirada:</strong></span>
+                            <span style="font-size:12px; color:red; font-weight:bold;">${dataRetiradaFormatada}</span>
+                        </div>
                     </div>
-                    <div class="termo-entrega">
-                        <div class="termo-titulo">TERMO DE CONFERÊNCIA E RETIRADA</div>
-                        <div class="termo-desc">Preencher no ato da retirada:</div>
-                        <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Óculos entregue em perfeito estado?</div>
-                        <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Recebeu a receita oftálmica original de volta?</div>
-                        <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Realizou o teste de visão (Longe e Perto)?</div>
+                    <table class="pdf-table">
+                        <tr><th class="center" style="width:10%;">QTD</th><th>DESCRIÇÃO DO PRODUTO</th><th class="right" style="width:20%;">TOTAL</th></tr>
+                        ${carrinho.map(item => `<tr><td class="center">${item.qtd}</td><td>${item.nome}</td><td class="right">R$ ${(item.valor * item.qtd).toFixed(2)}</td></tr>`).join('')}
+                    </table>
+                    
+                    <div class="pdf-totals-inline">
+                        <span>TOTAL COMPRA: ${totalBaseTexto}</span>
+                        <span style="color:green;">SINAL PAGO: ${entradaTexto}</span>
+                        <span style="color:#d32f2f;">SALDO RESTANTE: ${saldoTexto} ${textParcelaExtra}</span>
                     </div>
-                    <div class="assinatura-box">
-                        <div class="assinatura-linha">Assinatura do Cliente</div>
-                        <div class="assinatura-linha">Assinatura do Caixa</div>
+
+                    <div class="pdf-footer-msg">
+                        Muito obrigado pela preferência! É obrigatória a apresentação deste comprovante para a retirada dos óculos.
                     </div>
                 </div>
-                <div class="via-impressao">
-                    <div class="print-title">ÓTICAS AMMO</div>
-                    <div class="print-subtitle">COMPROVANTE DO CLIENTE</div>
-                    <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
-                        <b>OS:</b> ${osNumero} | <b>Data:</b> ${dataAtual}<br>
-                        <b>Vendedor:</b> ${dadosVenda.vendedor}<br>
-                        <b>Previsão de Retirada:</b> <span style="font-size:12px; font-weight:bold;">${dataRetiradaFormatada}</span>
-                    </div>
-                    <div class="print-section">
-                        <b>DESCRIÇÃO:</b><br>${produtosHTML}
-                        <hr style="border-top:1px solid #000; margin: 4px 0;">
-                        <div class="print-row"><span>TOTAL DA COMPRA:</span> <span class="destaque-valor">${totalBaseTexto}</span></div>
-                        <div class="print-row"><span>VALOR PAGO (Entrada):</span> <b>${entradaTexto}</b></div>
-                        <div class="print-row" style="background: #e9ecef; padding: 2px;"><span>SALDO DEVEDOR:</span> <span class="destaque-valor">${saldoTexto} ${textParcelaExtra}</span></div>
-                    </div>
-                    <div class="print-section" style="text-align:center; margin-top:10px; font-size:9px; border: 1px dashed #000; padding: 4px;">
-                        <b>Obrigado pela preferência!</b><br>
-                        A apresentação deste comprovante é obrigatória para a retirada.
-                    </div>
-                </div>`;
+            `;
         }
     }
 
+    // ========================================================
+    // PROCESSAMENTO DA VENDA E GERAÇÃO PDF BASE64
+    // ========================================================
     async function processarOperacao(tipoOperacao) {
         if(carrinho.length === 0) { alert("Adicione produtos ao carrinho antes de prosseguir!"); return; }
         
@@ -1029,7 +1268,7 @@
         const btn = tipoOperacao === 'venda' ? document.getElementById('btnFinalVenda') : null;
         if(btn) {
             btn.disabled = true;
-            btn.innerHTML = "GERANDO E ENVIANDO... <i class='fas fa-spinner fa-spin ms-2'></i>";
+            btn.innerHTML = "GERANDO PDF E SALVANDO... <i class='fas fa-spinner fa-spin ms-2'></i>";
         }
 
         const idPedidoUnico = "AMMO-" + Date.now().toString().slice(-6);
@@ -1074,25 +1313,67 @@
         };
 
         try {
-            // DUPLO ENVIO (WRITE): Envia para o Banco Central invisivelmente e processa no Banco Local
-            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) }).catch(e => console.error("Falha ao salvar no Servidor Geral", e));
+            // Monta o HTML invisível
+            montarHtmlImpressao(dadosEnvio);
+            const elementoImpressao = document.getElementById('areaImpressao');
+            elementoImpressao.style.display = 'block';
+
+            // Configurações do PDF (Margens ajustadas e permitindo esticar na A4)
+            const opt = {
+                margin:       [5, 5, 5, 5], 
+                filename:     `${idPedidoUnico}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Gera PDF em Base64
+            const pdfBase64 = await html2pdf().set(opt).from(elementoImpressao).output('datauristring');
+            elementoImpressao.style.display = 'none'; // Esconde de novo
+
+            // Salva no objeto pra mandar ao Google Sheets
+            dadosEnvio.arquivoPdfBase64 = pdfBase64;
+
+            // Envia para o Banco
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) }).catch(e => console.error("Falha no Backup Geral", e));
             await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) });
             
-            montarHtmlImpressao(dadosEnvio);
-            
-            setTimeout(() => {
-                window.print();
-                alert("Operação finalizada! Retornando ao menu principal.");
-                window.location.href = 'menu1.html'; // Redireciona para a página de menu
-            }, 500);
+            // Exibe PDF na Tela
+            exibirPdfNaTela(pdfBase64, idPedidoUnico);
             
         } catch(e) {
-            alert("Erro de conexão. A venda não foi salva na planilha, tente novamente.");
+            alert("Erro na conexão ou na geração do PDF, tente novamente.");
             if(btn) { 
                 btn.disabled = false; 
                 btn.innerHTML = "<i class='fas fa-check-circle me-2'></i> FINALIZAR VENDA"; 
             }
         }
+    }
+
+    // ========================================================
+    // TELA DE SUCESSO E VISUALIZADOR DE PDF
+    // ========================================================
+    function exibirPdfNaTela(base64Str, idVenda) {
+        const appBody = document.getElementById('sistemaPDV');
+        appBody.innerHTML = `
+            <div class="container d-flex flex-column align-items-center justify-content-center h-100 p-4 w-100">
+                <h3 class="text-success fw-bold mb-2"><i class="fas fa-check-circle me-2"></i>Operação Finalizada!</h3>
+                <p class="text-muted mb-4">A venda foi registrada e o PDF salvo no banco de dados.</p>
+                
+                <div class="d-flex gap-3 mb-4">
+                    <button class="btn btn-outline-primary px-4 fw-bold" onclick="window.location.reload()">
+                        <i class="fas fa-home me-2"></i> Iniciar Nova Venda
+                    </button>
+                    <a href="${base64Str}" download="OS_${idVenda}.pdf" class="btn btn-warning px-4 fw-bold shadow-sm">
+                        <i class="fas fa-download me-2"></i> Baixar / Imprimir Agora
+                    </a>
+                </div>
+                
+                <div class="w-100 flex-grow-1 border rounded shadow-sm overflow-hidden" style="max-width: 900px; background: white;">
+                    <iframe src="${base64Str}" width="100%" height="100%" style="border:none;"></iframe>
+                </div>
+            </div>
+        `;
     }
     
     // Transições de form (SALVAR CLIENTE)
@@ -1128,8 +1409,7 @@
         };
         
         try { 
-            // DUPLO ENVIO (WRITE): Envia para o Banco Central e Processa no Banco Local
-            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha ao salvar no Servidor Geral", e));
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha Backup", e));
             await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }); 
             
             navegarAbas('receita');
@@ -1159,8 +1439,7 @@
             altOd: document.getElementById('altOd').value, altOe: document.getElementById('altOe').value 
         };
         try { 
-            // DUPLO ENVIO (WRITE): Envia para o Banco Central e Processa no Banco Local
-            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha ao salvar no Servidor Geral", e));
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha Backup", e));
             await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }); 
             
             navegarAbas('vendas');

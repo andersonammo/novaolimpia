@@ -85,14 +85,35 @@
         .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; border-top: 1px solid #EEE; padding-top: 10px; }
         .btn-salvar { background: #0d6efd; color: white; padding: 8px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-        /* ESCONDIDO PARA IMPRESSÃO DO PDF */
+        /* ==========================================
+           LAYOUT DE IMPRESSÃO IDÊNTICO AO PDV
+           ========================================== */
         @media print {
             body * { visibility: hidden; }
-            #pdf-content, #pdf-content * { visibility: visible; }
-            #pdf-content { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; background: white; color: black; font-family: sans-serif; }
-            .pdf-header { font-size: 24px; font-weight: bold; border-bottom: 2px solid black; margin-bottom: 20px; padding-bottom: 10px; }
-            .pdf-row { margin-bottom: 10px; font-size: 14px; }
-            .pdf-row strong { margin-right: 10px; }
+            #areaImpressao, #areaImpressao * { visibility: visible; }
+            #areaImpressao {
+                position: absolute; left: 0; top: 0; width: 100%;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #000;
+                background: white;
+            }
+            .via-impressao { border: 1px solid #000; border-radius: 5px; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; }
+            .print-title { text-align: center; font-weight: 900; font-size: 13px; margin-bottom: 4px; letter-spacing: 1px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+            .print-subtitle { text-align: center; font-size: 11px; font-weight: bold; margin-top: -2px; margin-bottom: 6px; color: #444; }
+            .print-section { margin-bottom: 6px; line-height: 1.2; }
+            .print-section b { color: #222; }
+            .print-row { display: flex; justify-content: space-between; margin-bottom: 3px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
+            .print-row:last-child { border-bottom: none; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 4px; margin-bottom: 4px; }
+            .print-table th, .print-table td { border: 1px solid #000; padding: 2px; text-align: center; font-size: 9px; }
+            .print-table th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
+            .termo-entrega { margin-top: 8px; border: 1px solid #000; padding: 6px; border-radius: 5px; background-color: #f9f9f9 !important; -webkit-print-color-adjust: exact; }
+            .termo-titulo { text-align: center; font-weight: 900; font-size: 10px; margin-bottom: 3px; }
+            .termo-desc { text-align: center; font-size: 9px; margin-bottom: 6px; font-style: italic; }
+            .check-item { display: flex; align-items: center; margin-bottom: 4px; font-weight: bold; font-size: 9px; }
+            .check-box { margin-right: 10px; font-weight: normal; }
+            .assinatura-box { margin-top: 20px; display: flex; justify-content: space-around; }
+            .assinatura-linha { border-top: 1px solid #000; width: 40%; text-align: center; padding-top: 3px; font-weight: bold; font-size: 9px; }
+            .destaque-valor { font-size: 12px; font-weight: 900; }
         }
     </style>
 </head>
@@ -191,11 +212,14 @@
 
                 <div class="action-footer">
                     <div class="action-left">
-                        <button class="btn-action btn-voltar" onclick="window.location.href='file:///C:/Users/Usu%C3%A1rio/Documents/demonstrativo/menu2.html'">
+                        <button class="btn-action btn-voltar" onclick="window.location.href='./menu1.html'">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </button>
                     </div>
                     <div class="action-right">
+                        <button class="btn-action" style="background-color: #0dcaf0; color: #000;" onclick="reimprimirOSCompleta()">
+                            <i class="fas fa-print"></i> Reimprimir OS
+                        </button>
                         <button class="btn-action btn-excluir" onclick="abrirModalSenhaExclusao()"><i class="fas fa-trash"></i> Excluir Pedido</button>
                         <button class="btn-action btn-editar" onclick="abrirModalEdicao()">Editar Pedido</button>
                     </div>
@@ -205,6 +229,7 @@
 
     </div>
 
+    <!-- Modais e Sobreposições -->
     <div class="modal-overlay" id="modal-edicao">
         <div class="modal-box">
             <div class="modal-header">
@@ -245,16 +270,7 @@
         </div>
     </div>
 
-    <div id="pdf-content" style="display: none;">
-        <div class="pdf-header">ÓTICAS AMMO - COMPROVANTE DE PEDIDO</div>
-        <div class="pdf-row"><strong>Ordem de Serviço:</strong> <span id="pdf-os"></span></div>
-        <div class="pdf-row"><strong>Cliente:</strong> <span id="pdf-nome"></span></div>
-        <div class="pdf-row"><strong>Data Emissão:</strong> <span id="pdf-data"></span></div>
-        <div class="pdf-row"><strong>Produtos:</strong> <span id="pdf-produtos"></span></div>
-        <div class="pdf-row"><strong>Valor Total:</strong> <span id="pdf-total"></span></div>
-        <div class="pdf-row"><strong>Status de Pagamento:</strong> <span id="pdf-status"></span></div>
-        <div style="margin-top: 50px; text-align: center; border-top: 1px solid #000; width: 300px; padding-top:10px;">Assinatura do Cliente</div>
-    </div>
+    <div id="areaImpressao" style="display: none;"></div>
 
     <div id="loading-overlay">
         <i class="fas fa-spinner fa-spin fa-2x"></i>
@@ -262,9 +278,9 @@
     </div>
 
     <script>
-        const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzciM5IA25tZ9CcRkwj0-okP5CQ0IG3wpmZeT40vbPGiCtovD3au5Ccgr9jTxcJhSc6/exec'; 
+        const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; 
+        const URL_BASE_2_PRINCIPAL = "https://script.google.com/macros/s/AKfycbzciM5IA25tZ9CcRkwj0-okP5CQ0IG3wpmZeT40vbPGiCtovD3au5Ccgr9jTxcJhSc6/exec"; 
 
-        // CONFIGURAÇÃO DAS SENHAS
         const SENHA_ADMIN = 'admin123';
         const SENHA_MASTER = 'master123';
 
@@ -279,26 +295,19 @@
         const modalEdicao = document.getElementById('modal-edicao');
         const modalSenha = document.getElementById('modal-senha-exclusao');
 
-        // MAPA DE VENDAS
         const colMap = { os: 0, data: 1, vendedor: 2, nome: 3, produtos: 4, total: 8, tipo_pagto: 9, status_pagto: 10 };
-
-        // MAPA DE RECEITAS
         const recMap = { nome:0, esfOD:1, cilOD:2, eixoOD:3, dnpOD:4, altOD:5, esfOE:6, cilOE:7, eixoOE:8, dnpOE:9, altOE:10, adicao:11, medico:12, obs:13 };
-
-        // MAPA DE CLIENTES
         const cliMap = { nome: 2, cpf: 4, telefone: 13, nascimento: 3 };
 
         function alternarVisao(visao) {
             if (visao === 'lista') {
                 document.getElementById('view-lista').style.display = 'block';
                 document.getElementById('view-receita').style.display = 'none';
-                
                 document.getElementById('tab-cliente').classList.add('active');
                 document.getElementById('tab-receita').classList.remove('active');
             } else if (visao === 'receita') {
                 document.getElementById('view-lista').style.display = 'none';
                 document.getElementById('view-receita').style.display = 'block';
-                
                 document.getElementById('tab-cliente').classList.remove('active');
                 document.getElementById('tab-receita').classList.add('active');
             }
@@ -329,7 +338,7 @@
             alternarVisao('lista');
 
             try {
-                const url = `${URL_APPS_SCRIPT}?apiCaixa=true&acao=${acao}&termo=${encodeURIComponent(termo)}&tipo=${tipoBusca}`;
+                const url = `${URL_BASE_2_PRINCIPAL}?apiCaixa=true&acao=${acao}&termo=${encodeURIComponent(termo)}&tipo=${tipoBusca}`;
                 const response = await fetch(url);
                 const result = await response.json();
 
@@ -437,7 +446,7 @@
             document.getElementById('loading-text').innerText = "Buscando Receita...";
 
             try {
-                const url = `${URL_APPS_SCRIPT}?apiCaixa=true&acao=buscar_receita&nome=${encodeURIComponent(nomeParaBuscar)}`;
+                const url = `${URL_BASE_2_PRINCIPAL}?apiCaixa=true&acao=buscar_receita&nome=${encodeURIComponent(nomeParaBuscar)}`;
                 const response = await fetch(url);
                 const result = await response.json();
 
@@ -475,6 +484,102 @@
             }
         }
 
+        async function reimprimirOSCompleta() {
+            if (!linhaSelecionada || modoAtual === 'clientes') {
+                alert("Selecione um pedido na lista para imprimir.");
+                return;
+            }
+
+            overlay.style.display = 'flex';
+            document.getElementById('loading-text').innerText = "Buscando dados completos da O.S...";
+
+            try {
+                const osNumero = linhaSelecionada[colMap.os];
+                const nomeCliente = linhaSelecionada[colMap.nome];
+                const vendedor = linhaSelecionada[colMap.vendedor];
+                const dataVenda = formatarData(linhaSelecionada[colMap.data]);
+                const produtos = linhaSelecionada[colMap.produtos];
+                const totalVenda = formatarMoeda(linhaSelecionada[colMap.total]);
+                const statusPagto = linhaSelecionada[colMap.status_pagto];
+                const formaPagto = linhaSelecionada[colMap.tipo_pagto];
+
+                const urlRec = `${URL_BASE_2_PRINCIPAL}?apiCaixa=true&acao=buscar_receita&nome=${encodeURIComponent(nomeCliente)}`;
+                const response = await fetch(urlRec);
+                const result = await response.json();
+                
+                let rec = Array(14).fill('--');
+                if (!result.erro && result.dados) { rec = result.dados; }
+
+                const divImpressao = document.getElementById('areaImpressao');
+                const tabletFrame = document.querySelector('.tablet-frame');
+                if (tabletFrame) tabletFrame.style.display = 'none';
+                
+                divImpressao.innerHTML = `
+                    <div class="via-impressao">
+                        <div class="print-title">ÓTICAS AMMO</div>
+                        <div class="print-subtitle">ORDEM DE SERVIÇO - VIA LABORATÓRIO (REIMPRESSÃO)</div>
+                        <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
+                            <b>OS:</b> ${osNumero} | <b>Data Origem:</b> ${dataVenda}<br>
+                            <b>Colaborador(a):</b> ${vendedor}<br>
+                        </div>
+                        <div class="print-section">
+                            <b>PRODUTOS (Armação / Lentes):</b><br>
+                            ${produtos}
+                        </div>
+                        <div class="print-section">
+                            <table class="print-table">
+                                <tr style="background:#ddd"><th colspan="6">VISÃO PARA LONGE</th></tr>
+                                <tr><th>Olho</th><th>Esf</th><th>Cil</th><th>Eixo</th><th>DNP</th><th>Alt</th></tr>
+                                <tr><td><b>OD</b></td><td>${rec[recMap.esfOD] || '--'}</td><td>${rec[recMap.cilOD] || '--'}</td><td>${rec[recMap.eixoOD] || '--'}</td><td>${rec[recMap.dnpOD] || '--'}</td><td>${rec[recMap.altOD] || '--'}</td></tr>
+                                <tr><td><b>OE</b></td><td>${rec[recMap.esfOE] || '--'}</td><td>${rec[recMap.cilOE] || '--'}</td><td>${rec[recMap.eixoOE] || '--'}</td><td>${rec[recMap.dnpOE] || '--'}</td><td>${rec[recMap.altOE] || '--'}</td></tr>
+                                <tr style="background:#ddd"><th colspan="6">VISÃO PARA PERTO</th></tr>
+                                <tr><th>Olho</th><th>Esf</th><th>Cil</th><th>Eixo</th><th colspan="2">Adição</th></tr>
+                                <tr><td><b>OD</b></td><td>${rec[recMap.esfOD] || '--'}</td><td>${rec[recMap.cilOD] || '--'}</td><td>${rec[recMap.eixoOD] || '--'}</td><td colspan="2" rowspan="2" style="vertical-align:middle; font-weight:bold; font-size:12px;">${rec[recMap.adicao] || '--'}</td></tr>
+                                <tr><td><b>OE</b></td><td>${rec[recMap.esfOE] || '--'}</td><td>${rec[recMap.cilOE] || '--'}</td><td>${rec[recMap.eixoOE] || '--'}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="via-impressao">
+                        <div class="print-title">ÓTICAS AMMO</div>
+                        <div class="print-subtitle">CONTROLE INTERNO - VIA CAIXA</div>
+                        <div class="print-section" style="background:#f0f0f0; padding:6px; border-radius:3px;">
+                            <b>OS:</b> ${osNumero} | <b>Data Origem:</b> ${dataVenda}<br>
+                            <b>Vendedor:</b> ${vendedor}<br>
+                            <b>Cliente:</b> ${nomeCliente}<br>
+                        </div>
+                        <div class="print-section">
+                            <b>PRODUTOS:</b><br>${produtos}
+                            <hr style="border-top:1px solid #000; margin: 4px 0;">
+                            <div class="print-row"><span>VALOR TOTAL:</span> <span class="destaque-valor">${totalVenda}</span></div>
+                            <div class="print-row"><span>STATUS DO PAGAMENTO:</span> <b>${statusPagto}</b></div>
+                            <div class="print-row"><span>FORMA DE PGTO:</span> <b>${formaPagto}</b></div>
+                        </div>
+                        <div class="termo-entrega">
+                            <div class="termo-titulo">TERMO DE CONFERÊNCIA E RETIRADA</div>
+                            <div class="termo-desc">Preencher no ato da retirada:</div>
+                            <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Óculos entregue em perfeito estado?</div>
+                            <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Recebeu a receita oftálmica original de volta?</div>
+                            <div class="check-item"><span class="check-box">(   ) Sim   (   ) Não</span> Realizou o teste de visão (Longe e Perto)?</div>
+                        </div>
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Assinatura do Cliente</div>
+                            <div class="assinatura-linha">Assinatura do Caixa</div>
+                        </div>
+                    </div>`;
+
+                window.print();
+
+                if (tabletFrame) tabletFrame.style.display = 'flex';
+
+            } catch (e) {
+                console.error(e);
+                alert("Erro ao montar layout de impressão.");
+            } finally {
+                overlay.style.display = 'none';
+                document.getElementById('loading-text').innerText = "Processando...";
+            }
+        }
+
         function abrirModalEdicao() {
             if (!linhaSelecionada || modoAtual === 'clientes') {
                 alert("Por favor, selecione um pedido na lista primeiro.");
@@ -493,25 +598,19 @@
         function fecharModalEdicao() { modalEdicao.style.display = 'none'; }
 
         async function salvarEdicaoEGerarPDF() {
-            overlay.style.display = 'flex';
-            document.getElementById('loading-text').innerText = "Gerando PDF...";
-
             try {
                 fecharModalEdicao();
                 
-                document.getElementById('pdf-os').innerText = linhaSelecionada[colMap.os];
-                document.getElementById('pdf-nome').innerText = document.getElementById('edit-nome').value;
-                document.getElementById('pdf-data').innerText = formatarData(linhaSelecionada[colMap.data]);
-                document.getElementById('pdf-produtos').innerText = document.getElementById('edit-produto').value;
-                document.getElementById('pdf-total').innerText = formatarMoeda(document.getElementById('edit-total').value);
-                document.getElementById('pdf-status').innerText = document.getElementById('edit-status').value;
+                // Mapeando dados editados de volta para a linhaSelecionada para a reimpressão puxar os dados atualizados
+                linhaSelecionada[colMap.nome] = document.getElementById('edit-nome').value;
+                linhaSelecionada[colMap.produtos] = document.getElementById('edit-produto').value;
+                linhaSelecionada[colMap.total] = document.getElementById('edit-total').value;
+                linhaSelecionada[colMap.status_pagto] = document.getElementById('edit-status').value;
+                linhaSelecionada[colMap.tipo_pagto] = document.getElementById('edit-pagto').value;
 
-                window.print();
+                await reimprimirOSCompleta();
             } catch (e) {
                 alert("Erro ao processar PDF.");
-            } finally {
-                overlay.style.display = 'none';
-                document.getElementById('loading-text').innerText = "Processando...";
             }
         }
 
@@ -547,7 +646,7 @@
                 try {
                     const osParaExcluir = linhaSelecionada[colMap.os];
                     
-                    const url = `${URL_APPS_SCRIPT}?apiCaixa=true&acao=excluir_os&os=${encodeURIComponent(osParaExcluir)}`;
+                    const url = `${URL_BASE_2_PRINCIPAL}?apiCaixa=true&acao=excluir_os&os=${encodeURIComponent(osParaExcluir)}`;
                     const response = await fetch(url);
                     const result = await response.json();
 

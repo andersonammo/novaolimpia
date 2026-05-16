@@ -17,6 +17,10 @@
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+    @supports (height: 100dvh) {
+      body { height: 100dvh; min-height: 100dvh; }
+    }
+    input, button, select, textarea { font-size: 16px; }
   </style>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden font-sans selection:bg-blue-500 selection:text-white relative">
@@ -284,19 +288,30 @@
   <script>
     // 1. Definição das URLs
     const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Apenas recebe dados
-    const URL_BASE_2_PRINCIPAL = 'https://script.google.com/macros/s/AKfycbyRnFjzeYrGvweXMaLABVnWOgL4DHi5AMzBpsvrnVyxVB1dWmwvZZoQ5WuZblzzGx3B-w/exec'; // CONFIRME SE ESSA É A MESMA URL DO PC
+    const URL_BASE_2_PRINCIPAL = 'https://script.google.com/macros/s/AKfycbyt7EnnYa60CW4T200XHZacfHqDPHQ8OFHexSwMf14jR-W_eqDh-NMhaY_bCxaze2RLpA/exec'; // CONFIRME SE ESSA É A MESMA URL DO PC
 
     // 2. Lista de ações que são APENAS de leitura (buscam dados)
     const ACOES_LEITURA = ['login', 'buscarMetas', 'listarAniversariantes', 'listarComissoes'];
 
     // 3. Roteador Inteligente de Banco de Dados
+    async function fetchComTimeout(url, options = {}, tempoLimite = 20000) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), tempoLimite);
+      try {
+        const resposta = await fetch(url, { ...options, signal: controller.signal, cache: 'no-store' });
+        return resposta;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
     async function apiAmmo(payload) {
       const isLeitura = ACOES_LEITURA.includes(payload.acao);
 
       if (isLeitura) {
         // LEITURA: Busca exclusivamente na Base 2 (Principal da unidade)
         try {
-          const res = await fetch(URL_BASE_2_PRINCIPAL, {
+          const res = await fetchComTimeout(URL_BASE_2_PRINCIPAL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
@@ -310,7 +325,7 @@
         // LANÇAMENTO/ESCRITA: Envia para a Base 2 (Local) e faz um backup na Base 1 (Geral)
         
         // Dispara para a Base Geral em background (não trava a tela do consultor)
-        fetch(URL_BASE_1_GERAL, {
+        fetchComTimeout(URL_BASE_1_GERAL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
@@ -318,7 +333,7 @@
 
         // Aguarda a resposta da Base Principal para dar o feedback na tela
         try {
-          const resPrincipal = await fetch(URL_BASE_2_PRINCIPAL, {
+          const resPrincipal = await fetchComTimeout(URL_BASE_2_PRINCIPAL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
@@ -341,16 +356,33 @@
       setInterval(verificarHorarioExpediente, 1000);
     };
 
-    // --- TELA CHEIA (FULLSCREEN) ---
-    function alternarTelaCheia() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.log(`Erro ao tentar entrar em tela cheia: ${err.message}`);
-        });
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
+    // --- COMPATIBILIDADE PWA / MOBILE ---
+    function appInstaladoComoAtalho() {
+      return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function podeUsarTelaCheia() {
+      return !!(document.documentElement && document.documentElement.requestFullscreen) && !appInstaladoComoAtalho();
+    }
+
+    async function entrarEmTelaCheiaSePossivel() {
+      try {
+        if (!document.fullscreenElement && podeUsarTelaCheia()) {
+          await document.documentElement.requestFullscreen();
         }
+      } catch (err) {
+        // Em atalhos/PWA mobile, principalmente iOS, tela cheia pode ser bloqueada ou inexistente.
+        // Isso não deve impedir o login.
+        console.warn('Tela cheia indisponível neste modo de execução:', err);
+      }
+    }
+
+    // --- TELA CHEIA (FULLSCREEN) ---
+    async function alternarTelaCheia() {
+      if (!document.fullscreenElement) {
+        await entrarEmTelaCheiaSePossivel();
+      } else if (document.exitFullscreen) {
+        try { await document.exitFullscreen(); } catch (err) { console.warn('Não foi possível sair da tela cheia:', err); }
       }
     }
 
@@ -421,9 +453,7 @@
       divErro.classList.add('hidden');
 
       try {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(e => {});
-        }
+        await entrarEmTelaCheiaSePossivel();
 
         // Validação agora passa pelo Roteador (Consulta apenas a Base 2)
         const data = await apiAmmo({ acao: 'login', usuario: usuario, senha: senha });
@@ -437,7 +467,10 @@
           mostrarErroLogin(data.mensagem || "Usuário ou senha inválidos.");
         }
       } catch (error) {
-        mostrarErroLogin("Erro de conexão com o banco de dados principal.");
+        const mensagem = error && error.name === 'AbortError'
+          ? "Tempo de conexão esgotado. Verifique a internet e tente novamente."
+          : "Erro de conexão com o banco de dados principal.";
+        mostrarErroLogin(mensagem);
       } finally {
         if(btnEntrar.innerText !== "Sucesso!") {
           btnEntrar.innerText = "Entrar no Sistema";

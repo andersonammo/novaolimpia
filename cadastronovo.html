@@ -1351,6 +1351,7 @@
     }
 
     // ========================================================
+    // ========================================================
     // TELA DE SUCESSO E VISUALIZADOR DE PDF
     // ========================================================
     function exibirPdfNaTela(base64Str, idVenda) {
@@ -1361,7 +1362,7 @@
                 <p class="text-muted mb-4">A venda foi registrada e o PDF salvo no banco de dados.</p>
                 
                 <div class="d-flex gap-3 mb-4">
-                    <button class="btn btn-outline-primary px-4 fw-bold" onclick="window.location.reload()">
+                    <button class="btn btn-outline-primary px-4 fw-bold" onclick="window.location.href='./menu1.html'">
                         <i class="fas fa-home me-2"></i> Iniciar Nova Venda
                     </button>
                     <a href="${base64Str}" download="OS_${idVenda}.pdf" class="btn btn-warning px-4 fw-bold shadow-sm">

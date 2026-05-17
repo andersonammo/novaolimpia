@@ -1,14 +1,14 @@
-const CACHE_NAME = 'dashammo-v1';
+const CACHE_NAME = 'novaolimpia-v1';
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         return cache.addAll([
-          '/dashammo/',
-          '/dashammo/index.html',
-          '/dashammo/icon-192.png',
-          '/dashammo/icon-512.png'
+          '/novaolimpia/',
+          '/novaolimpia/index.html',
+          '/novaolimpia/icon-192.png',
+          '/novaolimpia/icon-512.png'
         ]);
       })
   );

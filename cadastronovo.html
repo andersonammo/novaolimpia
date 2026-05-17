@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CADASTRO CLIENTES - PDV</title>
-    <!-- Fontes e Frameworks Modernos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Biblioteca para gerar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -214,37 +212,36 @@
         .total-box .text-gold { color: var(--ammo-gold); }
 
         /* ==========================================
-           LAYOUT DE IMPRESSÃO - A4 PREENCHIDO (LETRAS MAIORES)
+           LAYOUT DE IMPRESSÃO - A4 SUPER REDUZIDO
            ========================================== */
         #areaImpressao {
             font-family: 'Inter', Helvetica, sans-serif;
             color: #111;
             background: #fff;
-            width: 790px; /* Largura perfeita para A4 */
+            width: 790px;
             margin: 0 auto;
             padding: 0 15px;
         }
         
         .pdf-via {
-            padding: 12px 18px; /* Aumentado o espaço interno */
-            margin-bottom: 22px; /* Aumentado o distanciamento entre vias */
+            padding: 4px 10px; /* Reduzido */
+            margin-bottom: 6px; /* Reduzido */
             border: 1px solid #ced4da;
-            border-radius: 8px;
+            border-radius: 6px;
             position: relative;
             background-color: #fff;
             page-break-inside: avoid;
         }
 
-        /* Linha de corte entre as vias */
         .pdf-via:not(:last-child)::after {
             content: '✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -';
             position: absolute;
-            bottom: -15px;
+            bottom: -11px; /* Ajustado */
             left: 0;
             width: 100%;
             text-align: center;
             color: #adb5bd;
-            font-size: 12px; /* Tesoura maior */
+            font-size: 10px; /* Reduzido */
             letter-spacing: 2px;
         }
 
@@ -253,59 +250,58 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--ammo-navy);
-            padding-bottom: 8px;
-            margin-bottom: 10px;
+            padding-bottom: 4px; /* Reduzido */
+            margin-bottom: 6px; /* Reduzido */
         }
         
         .pdf-logo {
-            max-height: 42px; /* Logo maior */
+            max-height: 25px; /* Reduzido bastante */
             object-fit: contain;
         }
         
         .pdf-title-box { text-align: right; }
         .pdf-title {
-            font-size: 16px; /* Letra muito maior */
+            font-size: 13px; /* Reduzido */
             font-weight: 800;
             color: var(--ammo-navy);
             margin: 0;
             letter-spacing: 0.5px;
         }
         .pdf-via-name {
-            font-size: 11px; /* Letra maior */
+            font-size: 9px; /* Reduzido */
             font-weight: 700;
             color: #fff;
             background: var(--ammo-navy);
-            padding: 4px 10px;
-            border-radius: 4px;
+            padding: 2px 6px; /* Reduzido */
+            border-radius: 3px;
             display: inline-block;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         
-        /* Grid de 3 colunas compactas mas com letras grandes */
         .pdf-info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            font-size: 11px; /* FONTE AUMENTADA */
-            margin-bottom: 10px;
+            gap: 6px; /* Reduzido */
+            font-size: 10.5px; /* Ligeiramente reduzido */
+            margin-bottom: 6px; /* Reduzido */
             background: #f8f9fa;
-            padding: 8px 12px;
+            padding: 6px 10px; /* Reduzido */
             border-radius: 6px;
             border: 1px solid #e9ecef;
         }
-        .pdf-info-grid span { display: block; margin-bottom: 3px;}
+        .pdf-info-grid span { display: block; margin-bottom: 2px;}
         .pdf-info-grid strong { color: var(--ammo-navy); }
 
         .pdf-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px; /* FONTE AUMENTADA */
-            margin-bottom: 10px;
+            font-size: 10.5px;
+            margin-bottom: 6px; /* Reduzido */
             border: 1px solid #dee2e6;
         }
         .pdf-table th, .pdf-table td {
             border: 1px solid #dee2e6;
-            padding: 6px 8px; /* Mais espaço na célula */
+            padding: 4px 6px; /* Reduzido */
             text-align: left;
         }
         .pdf-table th {
@@ -313,55 +309,54 @@
             color: #ffffff !important;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 10px; /* FONTE AUMENTADA */
+            font-size: 9.5px;
             -webkit-print-color-adjust: exact;
         }
         .pdf-table td.center { text-align: center; }
         .pdf-table td.right { text-align: right; }
         
-        /* Box Financeiro em Linha Única para economizar espaço mas com letra boa */
         .pdf-totals-inline {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #f8f9fa;
             border: 1px solid #dee2e6;
-            padding: 8px 12px;
-            font-size: 12px; /* FONTE AUMENTADA */
+            padding: 6px 10px; /* Reduzido */
+            font-size: 11px;
             font-weight: bold;
             border-radius: 6px;
-            margin-bottom: 10px;
+            margin-bottom: 6px; /* Reduzido */
         }
 
         .pdf-termo {
-            font-size: 11px; /* FONTE AUMENTADA */
+            font-size: 10px;
             border: 1px solid #ced4da;
             background: #fdfdfd;
-            padding: 8px 12px;
+            padding: 6px 10px; /* Reduzido */
             border-radius: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* Reduzido */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .pdf-signatures { display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 5px; }
+        .pdf-signatures { display: flex; justify-content: space-around; margin-top: 15px; margin-bottom: 2px; }
         .pdf-sign-line {
             width: 40%;
             border-top: 1px solid #333;
             text-align: center;
-            font-size: 11px; /* FONTE AUMENTADA */
+            font-size: 10px;
             font-weight: 600;
-            padding-top: 4px;
+            padding-top: 2px;
         }
         
         .pdf-footer-msg {
             text-align: center;
-            font-size: 11px; /* FONTE AUMENTADA */
+            font-size: 10px;
             font-weight: 600;
             color: #555;
-            margin-top: 8px;
-            padding: 6px;
+            margin-top: 6px;
+            padding: 4px;
             border-top: 1px dashed #ccc;
         }
     </style>
@@ -379,7 +374,6 @@
                 
                 <div class="card-body bg-white">
                     
-                    <!-- Stepper Progress -->
                     <div class="stepper-wrapper">
                         <div class="step active" id="st-cliente">
                             <div class="step-circle">1</div>
@@ -395,7 +389,6 @@
                         </div>
                     </div>
 
-                    <!-- MÓDULO 1: CLIENTE -->
                     <div id="moduloCliente" class="fade-in container-fluid px-0 px-md-4">
                         <h5 class="text-secondary mb-4 border-bottom pb-2"><i class="fas fa-user-plus me-2 text-primary"></i>Dados do Cliente</h5>
                         <form id="formPDV">
@@ -441,7 +434,6 @@
                                 </div>
                             </div>
 
-                            <!-- ENDEREÇO COMPLETO -->
                             <div class="p-4 mb-4 bg-light" style="border-radius: 12px;">
                                 <h6 class="text-primary mb-3 fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Endereço</h6>
                                 <div class="row mb-3">
@@ -505,7 +497,6 @@
                         </form>
                     </div>
 
-                    <!-- MÓDULO 2: RECEITA -->
                     <div id="moduloReceita" style="display: none;" class="fade-in container-fluid px-0 px-md-4">
                         <div class="alert alert-primary py-3 mb-4 d-flex align-items-center rounded-3 border-0 bg-light">
                             <i class="fas fa-user-circle fa-2x text-primary me-3"></i>
@@ -594,7 +585,6 @@
                         </div>
                     </div>
 
-                    <!-- MÓDULO 3: VENDAS -->
                     <div id="moduloVendas" style="display: none;" class="fade-in container-fluid px-0 px-md-4">
                         <div class="alert alert-primary py-3 mb-4 d-flex align-items-center rounded-3 border-0 bg-light">
                             <i class="fas fa-user-circle fa-2x text-primary me-3"></i>
@@ -605,7 +595,6 @@
                         </div>
 
                         <div class="row g-4 h-100">
-                            <!-- Coluna Esquerda: Carrinho e Pagamento -->
                             <div class="col-lg-7 d-flex flex-column">
                                 <div class="bg-receita-box flex-grow-1 p-4 d-flex flex-column">
                                     <div class="text-center header-receita mb-3 bg-primary text-white">
@@ -712,7 +701,6 @@
                                 </div>
                             </div>
 
-                            <!-- Coluna Direita: Produtos -->
                             <div class="col-lg-5 d-flex flex-column">
                                 <div class="bg-receita-box flex-grow-1 border-primary border d-flex flex-column">
                                     <div class="text-center header-receita mb-3 bg-light text-dark border"><i class="fas fa-search me-2"></i>CATÁLOGO DE PRODUTOS</div>
@@ -730,7 +718,6 @@
                             </div>
                         </div>
 
-                        <!-- Botões Finais -->
                         <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-4">
                             <button type="button" class="btn btn-outline-custom" onclick="navegarAbas('receita')">
                                 <i class="fas fa-arrow-left me-2"></i> Voltar
@@ -1134,7 +1121,6 @@
                 </div>`;
         } else {
             divImpressao.innerHTML = `
-                <!-- 1. VIA LABORATÓRIO -->
                 <div class="pdf-via">
                     <div class="pdf-header">
                         <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
@@ -1166,7 +1152,6 @@
                     ${tabelaReceitaHTML}
                 </div>
 
-                <!-- 2. VIA CAIXA -->
                 <div class="pdf-via">
                     <div class="pdf-header">
                         <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
@@ -1214,7 +1199,6 @@
                     </div>
                 </div>
 
-                <!-- 3. VIA CLIENTE -->
                 <div class="pdf-via" style="margin-bottom: 0; border-bottom: none;">
                     <div class="pdf-header">
                         <img src="${urlLogoEmpresa}" class="pdf-logo" alt="Logo">
@@ -1300,16 +1284,16 @@
             telefone: document.getElementById('tel1').value,
             endereco: document.getElementById('rua').value + ", " + document.getElementById('numero').value + " - " + document.getElementById('bairro').value,
             itens: carrinho,
-            subtotal: document.getElementById('subtotal').value,
-            desconto: document.getElementById('vDesconto').value || 0,
-            acrescimo: document.getElementById('vAcrescimo').value || 0,
-            valorTotal: valorGeral.toFixed(2),
+            subtotal: document.getElementById('subtotal').value.replace('.', ','),
+            desconto: String(document.getElementById('vDesconto').value || 0).replace('.', ','),
+            acrescimo: String(document.getElementById('vAcrescimo').value || 0).replace('.', ','),
+            valorTotal: valorGeral.toFixed(2).replace('.', ','),
             formaPagamento: document.getElementById('formaPgto').value,
             condicao: condicaoEnvio,
             parcelas: parcelasEnvio,
             parcelasNum: parcelasInt,      
-            valorPago: entrada,            
-            saldoDevedor: saldoRealParaPlanilha        
+            valorPago: entrada.toFixed(2).replace('.', ','),            
+            saldoDevedor: saldoRealParaPlanilha.toFixed(2).replace('.', ',')        
         };
 
         try {
@@ -1318,12 +1302,11 @@
             const elementoImpressao = document.getElementById('areaImpressao');
             elementoImpressao.style.display = 'block';
 
-            // Configurações do PDF (Margens ajustadas e permitindo esticar na A4)
             const opt = {
-                margin:       [5, 5, 5, 5], 
+                margin:       [2, 2, 2, 2], // Margem ajustada para o mínimo possível
                 filename:     `${idPedidoUnico}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                image:        { type: 'jpeg', quality: 0.90 }, 
+                html2canvas:  { scale: 1.1, useCORS: true }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
@@ -1334,9 +1317,8 @@
             // Salva no objeto pra mandar ao Google Sheets
             dadosEnvio.arquivoPdfBase64 = pdfBase64;
 
-            // Envia para o Banco
-            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) }).catch(e => console.error("Falha no Backup Geral", e));
-            await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dadosEnvio) });
+            fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dadosEnvio) }).catch(e => console.error("Falha no Backup Geral", e));
+            await fetch(URL_BASE_2_PRINCIPAL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dadosEnvio) });
             
             // Exibe PDF na Tela
             exibirPdfNaTela(pdfBase64, idPedidoUnico);

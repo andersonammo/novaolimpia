@@ -44,9 +44,9 @@
     <div class="bg-white p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md relative overflow-hidden">
       <div class="absolute -top-20 -right-20 w-48 h-48 bg-yellow-400 rounded-full blur-3xl opacity-20"></div>
       
-      <div class="text-center mb-8 relative z-10">
-        <div class="inline-block py-3 px-8 bg-yellow-400 rounded-xl mb-4 shadow-md border-b-4 border-yellow-500">
-          <h1 class="text-5xl font-black tracking-widest text-red-600 drop-shadow-sm">AMMO</h1>
+      <div class="text-center mb-6 relative z-10">
+        <div class="flex justify-center mb-2">
+          <img src="https://i.postimg.cc/1Rd6QxWB/Untitled-design-(1).png" alt="Logo AMMO" class="h-40 object-contain drop-shadow-2xl">
         </div>
         <p class="text-gray-500 font-bold uppercase tracking-widest text-xs">Acesso Restrito - Consultores</p>
       </div>
@@ -80,8 +80,8 @@
     
     <aside class="w-64 lg:w-72 bg-[#0A192F] text-white hidden md:flex flex-col shadow-2xl z-10 border-r border-blue-900/50 h-full">
       
-      <div class="py-6 text-center bg-yellow-400 border-b border-yellow-500 shadow-md">
-        <h2 class="text-4xl lg:text-5xl font-black tracking-widest text-red-600 drop-shadow-sm">AMMO</h2>
+      <div class="pt-1 pb-1 flex justify-center items-center border-b border-white/5 bg-white/[0.02]">
+        <img src="https://i.postimg.cc/1Rd6QxWB/Untitled-design-(1).png" alt="Logo AMMO" class="h-32 w-32 lg:h-36 lg:w-36 object-contain drop-shadow-xl">
       </div>
 
       <div class="p-5 border-b border-white/5 bg-white/[0.02]">
@@ -146,7 +146,7 @@
 
     <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto h-full bg-[#F3F4F6]">
       
-      <div id="tela-home" class="block max-w-7xl mx-auto h-full flex flex-col">
+      <div id="tela-home" class="block max-w-7xl mx-auto">
         
         <div class="bg-white rounded-3xl p-5 md:p-6 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 relative overflow-hidden shrink-0">
           <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 opacity-60"></div>
@@ -171,7 +171,7 @@
           <span class="text-xs font-bold text-gray-400">Selecione uma ação 👇</span>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-5 flex-1 min-h-0 pb-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-5 pb-4">
           <button onclick="window.location.href='./menu1.html'" class="group text-left bg-gradient-to-br from-blue-600 to-blue-900 rounded-2xl p-4 lg:p-5 shadow-lg shadow-blue-600/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
             <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20"></div>
             <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white text-xl lg:text-2xl shadow-inner border border-white/20 group-hover:scale-110 transition-transform duration-300">🛒</div>
@@ -255,24 +255,36 @@
             </button>
             <h1 class="text-3xl font-black text-gray-800 tracking-tight">💸 Minhas Comissões</h1>
           </div>
-          <div>
-            <input type="text" id="filtroComissao" placeholder="Filtrar por OS, Cliente..." class="w-full md:w-64 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition-all shadow-sm">
+          
+          <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <div class="flex flex-col">
+              <label class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Data Início</label>
+              <input type="date" id="filtroDataInicio" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:border-green-500 transition-all shadow-sm">
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Data Fim</label>
+              <input type="date" id="filtroDataFim" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:border-green-500 transition-all shadow-sm">
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1">Buscar</label>
+              <input type="text" id="filtroComissao" placeholder="OS, Cliente..." class="w-full md:w-48 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:border-green-500 transition-all shadow-sm">
+            </div>
           </div>
         </header>
         
         <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-1 flex flex-col min-h-0">
           <div id="loadingComissoes" class="text-center py-10 text-sm font-bold text-gray-400 animate-pulse">Calculando suas comissões...</div>
           
-          <div class="overflow-auto custom-scrollbar flex-1">
+          <div class="overflow-auto custom-scrollbar flex-1 relative">
             <table class="w-full text-left border-collapse hidden" id="tabelaComissoes">
-              <thead class="sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <thead class="sticky top-0 bg-gray-50 z-10 shadow-sm border-b-2 border-gray-100">
                 <tr class="text-xs uppercase tracking-wider text-gray-500">
-                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Nº OS</th>
-                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Data</th>
-                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Cliente</th>
-                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Forma Pagto</th>
-                  <th class="p-4 font-extrabold border-b-2 border-gray-100">Valor Venda</th>
-                  <th class="p-4 font-extrabold border-b-2 border-green-200 text-green-700">Comissão (R$)</th>
+                  <th class="p-4 font-extrabold">Nº OS</th>
+                  <th class="p-4 font-extrabold">Data</th>
+                  <th class="p-4 font-extrabold">Cliente</th>
+                  <th class="p-4 font-extrabold">Forma Pagto</th>
+                  <th class="p-4 font-extrabold text-right">Valor Venda</th>
+                  <th class="p-4 font-extrabold text-right text-green-700">Comissão</th>
                 </tr>
               </thead>
               <tbody id="listaComissoes" class="text-sm divide-y divide-gray-100">
@@ -287,13 +299,11 @@
 
   <script>
     // 1. Definição das URLs
-    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Apenas recebe dados
-    const URL_BASE_2_PRINCIPAL = 'https://script.google.com/macros/s/AKfycbyt7EnnYa60CW4T200XHZacfHqDPHQ8OFHexSwMf14jR-W_eqDh-NMhaY_bCxaze2RLpA/exec'; // CONFIRME SE ESSA É A MESMA URL DO PC
+    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; 
+    const URL_BASE_2_PRINCIPAL = 'https://script.google.com/macros/s/AKfycbyt7EnnYa60CW4T200XHZacfHqDPHQ8OFHexSwMf14jR-W_eqDh-NMhaY_bCxaze2RLpA/exec'; 
 
-    // 2. Lista de ações que são APENAS de leitura (buscam dados)
     const ACOES_LEITURA = ['login', 'buscarMetas', 'listarAniversariantes', 'listarComissoes'];
 
-    // 3. Roteador Inteligente de Banco de Dados
     async function fetchComTimeout(url, options = {}, tempoLimite = 20000) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), tempoLimite);
@@ -309,7 +319,6 @@
       const isLeitura = ACOES_LEITURA.includes(payload.acao);
 
       if (isLeitura) {
-        // LEITURA: Busca exclusivamente na Base 2 (Principal da unidade)
         try {
           const res = await fetchComTimeout(URL_BASE_2_PRINCIPAL, {
             method: 'POST',
@@ -319,19 +328,15 @@
           return await res.json();
         } catch (error) {
           console.error("Erro de leitura na Base Principal:", error);
-          return { status: 'erro', mensagem: 'Falha na comunicação com o banco local.' };
+          return { status: 'erro', message: 'Falha na comunicação com o banco local.' };
         }
       } else {
-        // LANÇAMENTO/ESCRITA: Envia para a Base 2 (Local) e faz um backup na Base 1 (Geral)
-        
-        // Dispara para a Base Geral em background (não trava a tela do consultor)
         fetchComTimeout(URL_BASE_1_GERAL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         }).catch(e => console.error("Falha ao salvar no Servidor Geral (Base 1)", e));
 
-        // Aguarda a resposta da Base Principal para dar o feedback na tela
         try {
           const resPrincipal = await fetchComTimeout(URL_BASE_2_PRINCIPAL, {
             method: 'POST',
@@ -341,22 +346,21 @@
           return await resPrincipal.json();
         } catch (error) {
           console.error("Erro ao salvar na Base Principal", error);
-          return { status: 'erro', mensagem: 'Erro ao salvar os dados na unidade.' };
+          return { status: 'erro', message: 'Erro ao salvar os dados na unidade.' };
         }
       }
     }
 
     const telaLogin = document.getElementById('tela-login');
     const appContainer = document.getElementById('app-container');
+    let intervaloAtualizacaoMetas;
 
     window.onload = async function() {
       const consultor = localStorage.getItem('consultorLogado');
       if (consultor) { iniciarApp(consultor); }
-      
       setInterval(verificarHorarioExpediente, 1000);
     };
 
-    // --- COMPATIBILIDADE PWA / MOBILE ---
     function appInstaladoComoAtalho() {
       return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     }
@@ -371,30 +375,25 @@
           await document.documentElement.requestFullscreen();
         }
       } catch (err) {
-        // Em atalhos/PWA mobile, principalmente iOS, tela cheia pode ser bloqueada ou inexistente.
-        // Isso não deve impedir o login.
-        console.warn('Tela cheia indisponível neste modo de execução:', err);
+        console.warn('Tela cheia indisponível:', err);
       }
     }
 
-    // --- TELA CHEIA (FULLSCREEN) ---
     async function alternarTelaCheia() {
       if (!document.fullscreenElement) {
         await entrarEmTelaCheiaSePossivel();
       } else if (document.exitFullscreen) {
-        try { await document.exitFullscreen(); } catch (err) { console.warn('Não foi possível sair da tela cheia:', err); }
+        try { await document.exitFullscreen(); } catch (err) {}
       }
     }
 
-    // --- DESCONEXÃO AUTOMÁTICA 18h30 ---
     let avisoDisparado = false;
-
     function verificarHorarioExpediente() {
       const agora = new Date();
       const horas = agora.getHours();
-      const minutos = agora.getMinutes();
+      const minutes = agora.getMinutes();
       
-      if (horas === 18 && minutos === 30 && localStorage.getItem('consultorLogado') && !avisoDisparado) {
+      if (horas === 18 && minutes === 30 && localStorage.getItem('consultorLogado') && !avisoDisparado) {
         iniciarContagemLogout();
       }
     }
@@ -426,11 +425,9 @@
         
         if (tempo <= 0) {
           clearInterval(intervalo);
-          
           telaAviso.classList.add('opacity-0');
           boxAviso.classList.remove('scale-100');
           boxAviso.classList.add('scale-95');
-          
           setTimeout(() => {
             telaAviso.classList.add('hidden');
             sair(); 
@@ -439,7 +436,6 @@
       }, 1000);
     }
 
-    // --- LOGIN ---
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
@@ -455,7 +451,6 @@
       try {
         await entrarEmTelaCheiaSePossivel();
 
-        // Validação agora passa pelo Roteador (Consulta apenas a Base 2)
         const data = await apiAmmo({ acao: 'login', usuario: usuario, senha: senha });
 
         if (data.status === 'sucesso') {
@@ -467,10 +462,7 @@
           mostrarErroLogin(data.mensagem || "Usuário ou senha inválidos.");
         }
       } catch (error) {
-        const mensagem = error && error.name === 'AbortError'
-          ? "Tempo de conexão esgotado. Verifique a internet e tente novamente."
-          : "Erro de conexão com o banco de dados principal.";
-        mostrarErroLogin(mensagem);
+        mostrarErroLogin("Tempo de conexão esgotado ou Erro de conexão.");
       } finally {
         if(btnEntrar.innerText !== "Sucesso!") {
           btnEntrar.innerText = "Entrar no Sistema";
@@ -485,7 +477,6 @@
       divErro.classList.remove('hidden');
     }
 
-    // --- TRANSIÇÃO E ATUALIZAÇÃO DE METAS ---
     function iniciarApp(nomeCompleto) {
       const primeiroNome = nomeCompleto.split(' ')[0];
       document.getElementById('nomeConsultorSide').innerText = primeiroNome;
@@ -498,18 +489,23 @@
       }, 400);
 
       carregarMetas(nomeCompleto);
+
+      if(intervaloAtualizacaoMetas) clearInterval(intervaloAtualizacaoMetas);
+      intervaloAtualizacaoMetas = setInterval(() => {
+        carregarMetas(nomeCompleto);
+      }, 120000);
     }
 
     async function carregarMetas(consultor) {
       try {
-        // Passa pelo roteador (Consulta apenas Base 2)
         const data = await apiAmmo({ acao: 'buscarMetas', consultor: consultor });
         
-        let vendas = data.vendas || { semanal: 0, quinzenal: 0, mensal: 0 };
-        atualizarPainelMetas(vendas.semanal, vendas.quinzenal, vendas.mensal);
-      } catch (error) {
-        atualizarPainelMetas(0, 0, 0);
-      }
+        if (data.status === 'sucesso' && data.vendas) {
+          atualizarPainelMetas(data.vendas.semanal, data.vendas.quinzenal, data.vendas.mensal);
+        } else {
+          atualizarPainelMetas(0, 0, 0);
+        }
+      } catch (error) {}
     }
 
     function atualizarPainelMetas(vSemanal, vQuinzenal, vMensal) {
@@ -549,6 +545,8 @@
     }
 
     function sair() {
+      if (intervaloAtualizacaoMetas) clearInterval(intervaloAtualizacaoMetas);
+
       if (document.fullscreenElement && document.exitFullscreen) {
         document.exitFullscreen().catch(e => {});
       }
@@ -574,11 +572,9 @@
         });
 
         avisoDisparado = false; 
-
       }, 400);
     }
 
-    // --- NAVEGAÇÃO ---
     function mudarTela(idTela) {
       ['tela-home', 'tela-aniversarios', 'tela-comissoes'].forEach(id => {
         const el = document.getElementById(id);
@@ -599,9 +595,7 @@
       document.getElementById('tabelaAniversarios').classList.add('hidden');
       document.getElementById('loadingAniversarios').classList.remove('hidden');
       try {
-        // Passa pelo roteador (Consulta apenas Base 2)
         const data = await apiAmmo({ acao: 'listarAniversariantes', consultor: localStorage.getItem('consultorLogado') });
-        
         const tbody = document.getElementById('listaAniversariantes');
         tbody.innerHTML = '';
         
@@ -631,49 +625,125 @@
       }
     }
 
-    // --- COMISSÕES ---
+    // --- LÓGICA INTELIGENTE DE COMISSÕES ---
+    let dadosComissoesGlobais = [];
+    const formatadorBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
     async function abrirTelaComissoes() {
       mudarTela('tela-comissoes');
       document.getElementById('tabelaComissoes').classList.add('hidden');
       document.getElementById('loadingComissoes').classList.remove('hidden');
+      
+      const dataInicio = document.getElementById('filtroDataInicio');
+      const dataFim = document.getElementById('filtroDataFim');
+      
+      if (!dataInicio.value || !dataFim.value) {
+        const hoje = new Date();
+        const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+        
+        dataInicio.value = primeiroDia.toISOString().split('T')[0];
+        dataFim.value = ultimoDia.toISOString().split('T')[0];
+      }
+
       try {
-        // Passa pelo roteador (Consulta apenas Base 2)
         const data = await apiAmmo({ acao: 'listarComissoes', consultor: localStorage.getItem('consultorLogado') });
         
-        const tbody = document.getElementById('listaComissoes');
-        tbody.innerHTML = '';
-        
         if (data.status === 'sucesso' && data.dados && data.dados.length > 0) {
-          data.dados.forEach(venda => {
-            tbody.innerHTML += `
-              <tr class="hover:bg-green-50/50 transition-colors linha-comissao">
-                <td class="p-4 font-mono font-bold text-gray-500">#${venda.os}</td>
-                <td class="p-4 text-gray-600 font-medium whitespace-nowrap">${venda.data}</td>
-                <td class="p-4 font-bold text-gray-800">${venda.cliente}</td>
-                <td class="p-4 text-xs"><span class="bg-gray-100 text-gray-600 px-2 py-1.5 rounded-lg font-bold">${venda.pagamento}</span></td>
-                <td class="p-4 text-gray-700 font-medium">R$ ${parseFloat(venda.valorVenda).toFixed(2)}</td>
-                <td class="p-4 font-black text-green-600">R$ ${parseFloat(venda.comissao).toFixed(2)}</td>
-              </tr>
-            `;
-          });
+          dadosComissoesGlobais = data.dados;
         } else {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">Nenhuma venda encontrada para este período.</td></tr>';
+          dadosComissoesGlobais = [];
         }
+        
+        renderizarTabelaComissoes();
+        
         document.getElementById('loadingComissoes').classList.add('hidden');
         document.getElementById('tabelaComissoes').classList.remove('hidden');
       } catch (error) {
-        document.getElementById('loadingComissoes').innerText = "Erro ao buscar comissões.";
+        document.getElementById('loadingComissoes').innerText = "Erro ao buscar comissões. Tente novamente.";
       }
     }
 
-    document.getElementById('filtroComissao').addEventListener('keyup', function(e) {
-      const termo = e.target.value.toLowerCase();
-      const linhas = document.querySelectorAll('.linha-comissao');
-      linhas.forEach(linha => {
-        const texto = linha.innerText.toLowerCase();
-        linha.style.display = texto.includes(termo) ? '' : 'none';
+    function renderizarTabelaComissoes() {
+      const tbody = document.getElementById('listaComissoes');
+      const termoTexto = document.getElementById('filtroComissao').value.toLowerCase();
+      
+      const valInicio = document.getElementById('filtroDataInicio').value; 
+      const valFim = document.getElementById('filtroDataFim').value; 
+
+      let dataInicioFiltro = valInicio ? new Date(valInicio + "T00:00:00") : new Date("2000-01-01");
+      let dataFimFiltro = valFim ? new Date(valFim + "T23:59:59") : new Date("2100-01-01");
+      
+      tbody.innerHTML = '';
+      let totalVendas = 0;
+      let totalComissao = 0;
+      let itensFiltrados = 0;
+
+      dadosComissoesGlobais.forEach(venda => {
+        let mostrarData = true;
+        
+        if (venda.data) {
+          let dataVendaFormatada;
+          if (venda.data.includes('/')) {
+            const partes = venda.data.split('/');
+            dataVendaFormatada = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T12:00:00`);
+          } else {
+            dataVendaFormatada = new Date(venda.data);
+          }
+
+          if (!isNaN(dataVendaFormatada.getTime())) {
+             if (dataVendaFormatada < dataInicioFiltro || dataVendaFormatada > dataFimFiltro) {
+                mostrarData = false;
+             }
+          }
+        }
+
+        const textoVenda = `${venda.os} ${venda.cliente} ${venda.pagamento}`.toLowerCase();
+        const mostrarTexto = termoTexto === '' || textoVenda.includes(termoTexto);
+
+        if (mostrarData && mostrarTexto) {
+          itensFiltrados++;
+          const valVenda = parseFloat(venda.valorVenda) || 0;
+          const valComissao = parseFloat(venda.comissao) || 0;
+          
+          totalVendas += valVenda;
+          totalComissao += valComissao;
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-green-50/50 transition-colors">
+              <td class="p-4 font-mono font-bold text-gray-500">#${venda.os}</td>
+              <td class="p-4 text-gray-600 font-medium whitespace-nowrap">${venda.data}</td>
+              <td class="p-4 font-bold text-gray-800 truncate max-w-[150px]">${venda.cliente}</td>
+              <td class="p-4 text-xs"><span class="bg-gray-100 text-gray-600 px-2 py-1.5 rounded-lg font-bold">${venda.pagamento}</span></td>
+              <td class="p-4 text-gray-700 font-medium text-right">${formatadorBRL.format(valVenda)}</td>
+              <td class="p-4 font-black text-green-600 text-right">${formatadorBRL.format(valComissao)}</td>
+            </tr>
+          `;
+        }
       });
-    });
+
+      if (itensFiltrados === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">Nenhuma venda encontrada para este período. Lembre-se que o filtro considera apenas o primeiro nome do vendedor.</td></tr>';
+      } else {
+        tbody.innerHTML += `
+          <tr class="bg-green-50/80 border-t-4 border-green-200 sticky bottom-0">
+            <td colspan="4" class="p-4 text-right font-black text-green-800 uppercase tracking-widest text-[10px] md:text-xs">
+              TOTAIS DO PERÍODO:
+            </td>
+            <td class="p-4 font-black text-green-800 text-right text-sm md:text-base">
+              ${formatadorBRL.format(totalVendas)}
+            </td>
+            <td class="p-4 font-black text-green-700 text-right text-base md:text-lg">
+              ${formatadorBRL.format(totalComissao)}
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    document.getElementById('filtroComissao').addEventListener('input', renderizarTabelaComissoes);
+    document.getElementById('filtroDataInicio').addEventListener('change', renderizarTabelaComissoes);
+    document.getElementById('filtroDataFim').addEventListener('change', renderizarTabelaComissoes);
   </script>
 </body>
 </html>

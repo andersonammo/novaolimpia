@@ -1,21 +1,23 @@
 {
-  "name": "novaolimpia",
-  "short_name": "novaolimpia",
-  "description": "Painel de Gestão",
-  "start_url": "/novaolimpia/index.html",
+  "name": "Portal do Consultor AMMO",
+  "short_name": "AMMO Consultor",
+  "description": "Sistema de gestão e metas para consultores AMMO",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2c3e50",
+  "background_color": "#0A192F",
+  "theme_color": "#0A192F",
   "icons": [
     {
-      "src": "/novaolimpia/icon-192.png",
+      "src": "https://i.postimg.cc/1Rd6QxWB/Untitled-design-(1).png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/novaolimpia/icon-512.png",
+      "src": "https://i.postimg.cc/1Rd6QxWB/Untitled-design-(1).png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

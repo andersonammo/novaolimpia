@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Óticas Ammo - Simulador Profissional 3D</title>
+    <title>Óticas Ammo - Simulador Profissional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -21,8 +21,8 @@
         .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--accent-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* FUNDO E EFEITO 3D */
-        #full-bg-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; background: #111; transform: scale(1.15); transition: transform 0.1s ease-out; }
+        /* FUNDO ESTATICO (Efeito 3D Removido) */
+        #full-bg-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; background: #111; }
         
         #img-blurred-bg, #video-blurred-bg { width: 100%; height: 100%; object-fit: cover; filter: blur(5px) brightness(1.0); }
         #video-blurred-bg { display: none; }
@@ -31,16 +31,16 @@
         .simulator-stage { 
             position: absolute; top: 0; left: 0; right: 0; bottom: 45px; 
             display: flex; justify-content: center; align-items: center; z-index: 1; 
-            transform-style: preserve-3d; 
-            transition: transform 0.1s ease-out; 
             overflow: hidden; 
         }
         
-        .svg-engine { width: 100%; height: 100%; transform: scale(1.15); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
+        /* ESCALA REDUZIDA PARA 1.10 */
+        .svg-engine { width: 100%; height: 100%; transform: scale(1.10); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6)); }
         
         .lens-outline { fill: none; stroke: url(#lens-grad); stroke-width: 6; }
         
-        .corridor-line { fill: none; stroke: #ffffff; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        /* LINHAS PONTILHADAS */
+        .corridor-line { fill: none; stroke: #ffffff; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 8, 8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         
         /* Sincronizando animação da linha e da máscara de recorte */
         .corridor-line, #svg-corridor-path { transition: d 0.7s cubic-bezier(0.25, 1, 0.5, 1); }
@@ -68,13 +68,14 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .lens-header { padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
-        .lens-name { font-size: 11px; font-weight: 700; color: #eee; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;}
-        .lens-price { font-size: 14px; font-weight: 800; color: #fff; }
+        /* CABEÇALHO DA LENTE (NOME MAIOR EM CIMA, PREÇO MENOR EM BAIXO) */
+        .lens-header { padding: 10px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .lens-name { font-size: 14px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+        .lens-price { font-size: 11px; font-weight: 600; color: #bbb; text-align: center; }
 
         .lens-item.selected { background: rgba(240, 242, 245, 0.95); border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .lens-item.selected .lens-name { color: #555; }
-        .lens-item.selected .lens-price { color: var(--accent-blue); }
+        .lens-item.selected .lens-name { color: #333; }
+        .lens-item.selected .lens-price { color: var(--accent-blue); font-weight: 700; }
 
         .lens-options { max-height: 0; overflow: hidden; background: transparent; display: flex; flex-direction: column; transition: max-height 0.4s ease; }
         .lens-item.expanded .lens-options { max-height: 600px; padding-bottom: 10px; }
@@ -87,8 +88,6 @@
         .top-menu { position: absolute; top: 15px; left: 270px; display: flex; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 8px; z-index: 10; border: 1px solid rgba(255,255,255,0.1); }
         .top-btn { padding: 8px 12px; color: #fff; font-size: 11px; border-right: 1px solid rgba(255,255,255,0.1); font-weight: 600; cursor: pointer; }
         .env-selector { background: transparent; color: #fff; border: none; outline: none; font-size: 11px; font-weight: 600; cursor: pointer; }
-        
-        /* CORREÇÃO DAS CORES DO SELETOR DE AMBIENTE */
         .env-selector option { background: #222; color: #fff; font-weight: bold; }
 
         .right-menu { position: absolute; top: 50%; right: 20px; transform: translateY(-50%); display: flex; flex-direction: column; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 10px; z-index: 10; border: 1px solid rgba(255,255,255,0.1); }
@@ -124,9 +123,11 @@
         .btn-lancar-os:hover { background: #002277; }
 
         .valor-popup, .calc-popup { position: absolute; bottom: 45px; background: var(--white-bar); border: 1px solid #dee2e6; display: none; padding: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); border-radius: 8px 8px 0 0; z-index: 15; }
-        .valor-popup { left: 260px; gap: 20px; align-items: center; }
+        
+        /* POPUP DE OPÇÕES DE VALORES ATUALIZADO */
+        .valor-popup { left: 260px; gap: 12px; flex-direction: column; align-items: flex-start; }
         .valor-popup.show, .calc-popup.show { display: flex; }
-        .vp-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b6584; cursor: pointer; font-weight: 600; }
+        .vp-label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4b6584; cursor: pointer; font-weight: 600; }
         
         .calc-popup { right: 20px; flex-direction: column; width: 220px; }
         #calc-display { width: 100%; height: 35px; text-align: right; font-size: 18px; margin-bottom: 10px; border: 1px solid #ddd; }
@@ -243,7 +244,9 @@
         </div>
         
         <div class="valor-popup" id="valor-popup">
-            <label class="vp-label"><input type="checkbox" id="chk-mostrar" checked onchange="updateFinanceSystem()"> Mostrar Valores de Preços</label>
+            <label class="vp-label"><input type="radio" name="price-mode" value="avista" onchange="updateFinanceSystem()"> Valores à Vista</label>
+            <label class="vp-label"><input type="radio" name="price-mode" value="prazo" checked onchange="updateFinanceSystem()"> Valores a Prazo (Parcelado)</label>
+            <label class="vp-label"><input type="radio" name="price-mode" value="oculto" onchange="updateFinanceSystem()"> Ocultar Valores</label>
         </div>
 
         <div class="calc-popup" id="calc-popup">
@@ -380,7 +383,6 @@
             const treatSelect = activeLensItem.querySelector('.js-opt-treatment');
             const treatName = treatSelect.value !== "Nenhum" ? treatSelect.value : "";
             
-            /* Removemos o js-opt-photosensitive daqui conforme solicitado */
             const total = parseFloat(matSelect.value) + parseFloat(activeLensItem.querySelector('.js-opt-surface').value);
             activeLensItem.setAttribute('data-baseprice', total);
             
@@ -391,8 +393,16 @@
         function toggleValorPopup() { document.getElementById('valor-popup').classList.toggle('show'); document.getElementById('calc-popup').classList.remove('show'); }
         function toggleCalcPopup() { document.getElementById('calc-popup').classList.toggle('show'); document.getElementById('valor-popup').classList.remove('show'); }
 
+        /* NOVA LÓGICA DE MOSTRAR PREÇOS VISTA / PRAZO / OCULTO */
         function formatPriceStr(totalBruto, isCart = false) {
-            if (!document.getElementById('chk-mostrar').checked) return "---"; 
+            const mode = document.querySelector('input[name="price-mode"]:checked').value;
+            
+            if (mode === 'oculto') return "---"; 
+            
+            if (mode === 'avista') {
+                return totalBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+            
             const parcelas = parseInt(document.getElementById('installment-select').value) || 12;
             const valorParcela = totalBruto / parcelas;
             
@@ -419,39 +429,39 @@
 
             const configs = {
                 'lvl1': { 
-                    l: `M -100 ${yTop} L -100 ${yFunnelStart} C 200 ${yFunnelStart} 350 ${yCP2} 350 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 600 ${yFunnelStart} 550 ${yCP2} 550 ${yBottom}`, 
-                    cr: `L 550 ${yBottom} C 550 ${yCP2} 600 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    l: `M -100 ${yTop} L -100 ${yFunnelStart} C 200 ${yFunnelStart} 400 ${yCP2} 400 ${yBottom}`, 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 550 ${yCP2} 550 ${yBottom}`, 
+                    cr: `L 550 ${yBottom} C 550 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl2': { 
-                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 320 ${yCP2} 320 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 570 ${yCP2} 570 ${yBottom}`, 
-                    cr: `L 570 ${yBottom} C 570 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 350 ${yCP2} 350 ${yBottom}`, 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 600 ${yCP2} 600 ${yBottom}`, 
+                    cr: `L 600 ${yBottom} C 600 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl3': { 
-                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 290 ${yCP2} 290 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 590 ${yCP2} 590 ${yBottom}`, 
-                    cr: `L 590 ${yBottom} C 590 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 100 ${yFunnelStart} 310 ${yCP2} 310 ${yBottom}`, 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 900 ${yFunnelStart} 630 ${yCP2} 630 ${yBottom}`, 
+                    cr: `L 630 ${yBottom} C 630 ${yCP2} 900 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl4': { 
-                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 260 ${yCP2} 260 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 610 ${yCP2} 610 ${yBottom}`, 
-                    cr: `L 610 ${yBottom} C 610 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 100 ${yFunnelStart} 280 ${yCP2} 280 ${yBottom}`, 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 900 ${yFunnelStart} 720 ${yCP2} 720 ${yBottom}`, 
+                    cr: `L 720 ${yBottom} C 720 ${yCP2} 900 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl5': { 
-                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 230 ${yCP2} 230 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 630 ${yCP2} 630 ${yBottom}`, 
-                    cr: `L 630 ${yBottom} C 630 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 250 ${yCP2} 250 ${yBottom}`, 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 700 ${yCP2} 700 ${yBottom}`, 
+                    cr: `L 700 ${yBottom} C 700 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl6': { 
-                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 200 ${yFunnelStart} 200 ${yCP2} 200 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 800 ${yFunnelStart} 650 ${yCP2} 650 ${yBottom}`, 
-                    cr: `L 650 ${yBottom} C 650 ${yCP2} 800 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    l: `M -50 ${yTop} L -50 ${yFunnelStart} C 50 ${yFunnelStart} 200 ${yCP2} 200 ${yBottom}`, 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 950 ${yFunnelStart} 750 ${yCP2} 750 ${yBottom}`, 
+                    cr: `L 750 ${yBottom} C 750 ${yCP2} 950 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl7': { 
                     l: `M -50 ${yTop} L -50 ${yFunnelStart} C 100 ${yFunnelStart} 170 ${yCP2} 170 ${yBottom}`, 
-                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 900 ${yFunnelStart} 830 ${yCP2} 830 ${yBottom}`, 
-                    cr: `L 830 ${yBottom} C 830 ${yCP2} 900 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
+                    r: `M 1050 ${yTop} L 1050 ${yFunnelStart} C 900 ${yFunnelStart} 800 ${yCP2} 800 ${yBottom}`, 
+                    cr: `L 800 ${yBottom} C 800 ${yCP2} 900 ${yFunnelStart} 1050 ${yFunnelStart} L 1050 ${yTop}` 
                 },
                 'lvl8': { 
                     l: `M -50 ${yTop} L -50 ${yFunnelStart} C 100 ${yFunnelStart} 140 ${yCP2} 140 ${yBottom}`, 
@@ -465,9 +475,18 @@
             document.getElementById('svg-corridor-path').setAttribute('d', `${c.l} ${c.cr} ${topClearArea}`);
         }
 
+        /* NOVAS IMAGENS APLICADAS AQUI */
         function changeBg(idx) {
-            const ambientes = ['https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1512163143273-bde0e3cc7407?q=80&w=1400&auto=format&fit=crop', 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1600&auto=format&fit=crop', 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1400&auto=format&fit=crop', 'https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=1400&auto=format&fit=crop'];
-            document.getElementById('img-blurred-bg').src = ambientes[idx]; document.getElementById('img-sharp').setAttribute('href', ambientes[idx]);
+            const ambientes = [
+                'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1600&auto=format&fit=crop', // 0. Escritório
+                'https://i.postimg.cc/gk7Tnqdp/Whats-App-Image-2026-05-17-at-21-22-05.jpg', // 1. Carro
+                'https://i.postimg.cc/kGb7LMvg/Whats-App-Image-2026-05-17-at-21-13-30.jpg', // 2. Olho
+                'https://i.postimg.cc/W4GWWBZg/Whats-App-Image-2026-05-17-at-21-22-06.jpg', // 3. Livro
+                'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1400&auto=format&fit=crop', // 4. PC
+                'https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=1400&auto=format&fit=crop'  // 5. Montanha
+            ];
+            document.getElementById('img-blurred-bg').src = ambientes[idx]; 
+            document.getElementById('img-sharp').setAttribute('href', ambientes[idx]);
         }
 
         let camStream = null;
@@ -514,28 +533,6 @@
             window.location.href = 'cadastronovo.html'; 
         }
 
-        document.addEventListener('mousemove', (e) => {
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 40; 
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 40; 
-            aplicarEfeito3D(xAxis, yAxis);
-        });
-
-        window.addEventListener('deviceorientation', (e) => {
-            if (e.gamma === null || e.beta === null) return;
-            let xAxis = e.gamma / 3; 
-            let yAxis = (e.beta - 45) / 3; 
-            xAxis = Math.max(-15, Math.min(15, xAxis));
-            yAxis = Math.max(-15, Math.min(15, yAxis));
-            aplicarEfeito3D(xAxis, yAxis);
-        });
-
-        function aplicarEfeito3D(xAxis, yAxis) {
-            const stage = document.querySelector('.simulator-stage');
-            stage.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
-            const bg = document.getElementById('full-bg-container');
-            bg.style.transform = `scale(1.15) translate(${-xAxis * 2}px, ${-yAxis * 2}px)`;
-        }
-        
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const marcaSelecionadaViaUrl = urlParams.get('marca');

@@ -746,7 +746,7 @@
     // ==========================================
     // CONFIGURAÇÕES GERAIS E VARIÁVEIS 
     // ==========================================
-    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbyt7EnnYa60CW4T200XHZacfHqDPHQ8OFHexSwMf14jR-W_eqDh-NMhaY_bCxaze2RLpA/exec'; // Servidor Central
+    const URL_BASE_1_GERAL = 'https://script.google.com/macros/s/AKfycbzrmJ0cFA-e5vnrThixRZy5-BNQJruVR_Oo0hak1uL1GaOcAVXkqQGQXz0_Gy_qknCPXg/exec'; // Servidor Central
     const URL_BASE_2_PRINCIPAL = "https://script.google.com/macros/s/AKfycbyt7EnnYa60CW4T200XHZacfHqDPHQ8OFHexSwMf14jR-W_eqDh-NMhaY_bCxaze2RLpA/exec"; // Servidor Local
 
     let estoqueGlobal = []; 
@@ -781,14 +781,25 @@
                 document.getElementById('listaProdutosDisplay').innerHTML = "<div class='p-4 text-center text-muted'>Sem produtos.</div>"; 
             }
 
-            const lenteSalva = localStorage.getItem('lente_ammo_pendente');
+            // --- CARREGAMENTO AUTOMÁTICO DO SIMULADOR (INJETADO) ---
+            const lenteSalva = localStorage.getItem('lente_ammo_pendente') || localStorage.getItem('itensoroticas');
             if (lenteSalva) {
                 try {
                     const lente = JSON.parse(lenteSalva);
-                    addAoCarrinho(lente.codigo, lente.nome, lente.valor);
+                    
+                    // Tratamento unificado para o formato do Multifocal e da VS
+                    const nomeLente = lente.nome || lente.modelo; 
+                    const valorLente = parseFloat(lente.valor || lente.preco) || 0;
+                    const codigoLente = lente.codigo || "LENTE-SIMULADOR";
+                    
+                    addAoCarrinho(codigoLente, nomeLente, valorLente);
+                    
                     localStorage.removeItem('lente_ammo_pendente');
+                    localStorage.removeItem('itensoroticas');
                 } catch (e) { console.error("Erro ao ler lente", e); }
             }
+            // --------------------------------------------------------
+
         }).catch(err => { 
             alert("Erro de rede. A URL do Apps Script pode estar incorreta."); 
         });
@@ -890,7 +901,17 @@
 
     function calcularTotalVenda() {
         const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
-        const desconto = parseFloat(document.getElementById('vDesconto').value) || 0;
+        let desconto = parseFloat(document.getElementById('vDesconto').value) || 0;
+
+        // --- TRAVA DE SEGURANÇA AMMO (MÁXIMO 20% DE DESCONTO) INJETADA AQUI ---
+        const limiteDesconto = subtotal * 0.20;
+        if (desconto > limiteDesconto && subtotal > 0) {
+            alert('Atenção: A política comercial do sistema bloqueia descontos superiores a 20%. O valor foi reajustado ao limite máximo permitido.');
+            desconto = limiteDesconto;
+            document.getElementById('vDesconto').value = desconto.toFixed(2);
+        }
+        // ----------------------------------------------------------------------
+
         const acrescimo = parseFloat(document.getElementById('vAcrescimo').value) || 0;
         const entrada = parseFloat(document.getElementById('valorEntrada').value) || 0;
         

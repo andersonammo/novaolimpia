@@ -575,6 +575,57 @@
                             </div>
                         </div>
 
+                        <div class="bg-receita-box mb-4" style="border: 2px solid #fff3cd;">
+                            <div class="text-center header-receita mb-3" style="background-color: var(--ammo-gold); color: var(--ammo-navy);"><i class="fas fa-glasses me-2"></i> Medidas e Dados da Armação</div>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label>Horizontal maior da lente</label>
+                                    <input type="number" step="0.1" class="form-control text-center" id="armHorizontal" placeholder="Ex: 54">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Vertical maior da lente</label>
+                                    <input type="number" step="0.1" class="form-control text-center" id="armVertical" placeholder="Ex: 38">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Ponte</label>
+                                    <input type="number" step="0.1" class="form-control text-center" id="armPonte" placeholder="Ex: 18">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Diagonal maior da lente</label>
+                                    <input type="number" step="0.1" class="form-control text-center" id="armDiagonal" placeholder="Ex: 58">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>Altura da pupila</label>
+                                    <input type="number" step="0.1" class="form-control text-center" id="armAlturaPupila" placeholder="Ex: 24">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Tipo de armação</label>
+                                    <select class="form-select" id="armTipo">
+                                        <option value="">Selecione...</option>
+                                        <option value="Fio de Nylon">Fio de Nylon</option>
+                                        <option value="Aro Fechado">Aro Fechado</option>
+                                        <option value="3 Peças">3 Peças</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Marca</label>
+                                    <input type="text" class="form-control" id="armMarca" placeholder="Marca da armação">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Modelo</label>
+                                    <input type="text" class="form-control" id="armModelo" placeholder="Modelo / referência">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Cor</label>
+                                    <input type="text" class="form-control" id="armCor" placeholder="Cor da armação">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between mt-4">
                             <button type="button" class="btn btn-outline-custom" onclick="navegarAbas('cliente')">
                                 <i class="fas fa-arrow-left me-2"></i> Voltar
@@ -1104,6 +1155,12 @@
                 <tr><th class="center">Olho</th><th class="center">Esférico</th><th class="center">Cilíndrico</th><th class="center">Eixo</th><th colspan="2" class="center">Adição (ADD)</th></tr>
                 <tr><td class="center fw-bold">OD</td><td class="center">${document.getElementById('pOdEsf').value}</td><td class="center">${document.getElementById('pOdCil').value}</td><td class="center">${document.getElementById('pOdEixo').value}</td><td colspan="2" rowspan="2" class="center" style="vertical-align:middle; font-weight:800; font-size:14px; background:#f0f0f0;">${document.getElementById('adicao').value}</td></tr>
                 <tr><td class="center fw-bold">OE</td><td class="center">${document.getElementById('pOeEsf').value}</td><td class="center">${document.getElementById('pOeCil').value}</td><td class="center">${document.getElementById('pOeEixo').value}</td></tr>
+
+                <tr><th colspan="6" class="center">MEDIDAS E DADOS DA ARMAÇÃO</th></tr>
+                <tr><th class="center">Horizontal</th><th class="center">Vertical</th><th class="center">Ponte</th><th class="center">Diagonal</th><th class="center">Alt. Pupila</th><th class="center">Tipo</th></tr>
+                <tr><td class="center">${document.getElementById('armHorizontal').value}</td><td class="center">${document.getElementById('armVertical').value}</td><td class="center">${document.getElementById('armPonte').value}</td><td class="center">${document.getElementById('armDiagonal').value}</td><td class="center">${document.getElementById('armAlturaPupila').value}</td><td class="center">${document.getElementById('armTipo').value}</td></tr>
+                <tr><th colspan="2" class="center">Marca</th><th colspan="2" class="center">Modelo</th><th colspan="2" class="center">Cor</th></tr>
+                <tr><td colspan="2" class="center">${document.getElementById('armMarca').value}</td><td colspan="2" class="center">${document.getElementById('armModelo').value}</td><td colspan="2" class="center">${document.getElementById('armCor').value}</td></tr>
             </table>
         `;
 
@@ -1440,7 +1497,16 @@
             pOdEsf: document.getElementById('pOdEsf').value, pOdCil: document.getElementById('pOdCil').value, pOdEixo: document.getElementById('pOdEixo').value, 
             pOeEsf: document.getElementById('pOeEsf').value, pOeCil: document.getElementById('pOeCil').value, pOeEixo: document.getElementById('pOeEixo').value, 
             dnpOd: document.getElementById('dnpOd').value, dnpOe: document.getElementById('dnpOe').value, 
-            altOd: document.getElementById('altOd').value, altOe: document.getElementById('altOe').value 
+            altOd: document.getElementById('altOd').value, altOe: document.getElementById('altOe').value,
+            armHorizontal: document.getElementById('armHorizontal').value,
+            armVertical: document.getElementById('armVertical').value,
+            armPonte: document.getElementById('armPonte').value,
+            armDiagonal: document.getElementById('armDiagonal').value,
+            armAlturaPupila: document.getElementById('armAlturaPupila').value,
+            armTipo: document.getElementById('armTipo').value,
+            armMarca: document.getElementById('armMarca').value,
+            armModelo: document.getElementById('armModelo').value,
+            armCor: document.getElementById('armCor').value
         };
         try { 
             fetch(URL_BASE_1_GERAL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) }).catch(e => console.error("Falha Backup", e));
